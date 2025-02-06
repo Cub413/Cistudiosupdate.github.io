@@ -483,7 +483,7 @@ function addMirror() {
 }
 function addMonkey() {
   const loader = new THREE.OBJLoader();
-  loader.load('assets/Models/suzanne.obj', function(object) {
+  loader.load('assets/models/suzanne.obj', function(object) {
 
     const material = new THREE.MeshStandardMaterial({
       color: 0xffffff,
