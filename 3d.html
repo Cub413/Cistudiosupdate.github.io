@@ -1,0 +1,4041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Scene with Add Objects and Lights</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three/examples/js/controls/TransformControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three/examples/js/exporters/GLTFExporter.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three/examples/js/loaders/OBJLoader.js"></script>
+
+
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      display: flex;
+    }
+    canvas {
+      display: block;
+    }
+          /* Timeline */
+      #timeline {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background-color: #2c2c2c;
+        color: #fff;
+        padding: 5px;
+        border-top: 1px solid #444;
+        z-index: 1;
+      }
+      button {
+  background-color: #444;
+  color: white;
+  border: none;
+  padding: 5px px;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 5px;
+}
+
+button:hover {
+  background-color: #555;
+}
+
+.current-frame {
+  position: absolute;
+  width: 2px;
+  height: 100%;
+  background-color: red;
+  pointer-events: none;
+}
+
+.keyframe-marker {
+  width: 10px;
+  height: 10px;
+  background-color: yellow;
+  border-radius: 50%;
+  position: absolute;
+  top: 20px;
+  cursor: pointer;
+}
+
+.keyframe-marker:hover {
+  background-color: orange;
+}
+
+.frame-line {
+  position: absolute;
+  width: 1px;
+  height: 100%;
+  background-color: #555;
+}
+
+.frame-line:hover {
+  background-color: #888;
+}
+
+
+    #top-panel {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 50px;
+      background-color: #333;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      color: white;
+    }
+    #add-menu {
+      position: absolute;
+      top: 50px;
+      left: 10px;
+      background-color: #444;
+      border: 1px solid #555;
+      padding: 10px;
+      display: none;
+    }
+    #mesh-options, #light-options {
+      display: none;
+      margin-top: 10px;
+    }
+    button {
+      background-color: #555;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      margin: 2px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #777;
+    }
+    /* Contenedor de botones */
+#transformControlsIcons {
+    position: absolute;
+    top: 45%;
+    left: 10px;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+/* Estilo de los botones */
+#transformControlsIcons button {
+    padding: 1px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 25px;
+    height: 25px;
+    border-radius: 5px;
+}
+
+#transformControlsIcons button:hover {
+    background-color: #555;
+}
+#effects-button {
+  background-color: #555;
+  color: white;
+  border: none;
+  padding: 5px 5px;
+  margin: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 5px;
+}
+
+#effects-button:hover {
+  background-color: #777;
+}
+
+#water-menu {
+  background-color: #444;
+  border: 1px solid #555;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 5px;
+  display: none;
+}
+
+#water-menu button {
+  background-color: #555;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  margin: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 5px;
+}
+
+#water-menu button:hover {
+  background-color: #777;
+}
+
+#water-options label {
+  color: white;
+  margin-right: 5px;
+}
+
+#water-options input {
+  margin: 5px;
+  padding: 5px;
+}
+/* Estilo del botón */
+#particleButton {
+  padding: 1.3px;
+  background-color:#414244;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 17px;
+}
+
+#particleButton:hover {
+  background-color: #45a049;
+}
+
+/* Estilo del menú de partículas */
+.menu {
+  background-color: #f9f9f9;
+  padding: 1px;
+  border: 10px solid #ddd;
+  width: 200px;
+}
+
+.menu label {
+  margin: 5px 10;
+}
+
+#addParticleButton {
+  background-color: #777;
+  color: white;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+}
+
+#addParticleButton:hover {
+  background-color: #45a049;
+}
+
+
+    #transform-controls {
+      position: absolute;
+      top: 20%;
+      left: 0px;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    /* Estilo para el botón */
+.toggle-btn {
+  position: fixed;
+  top: 5px;
+  right: 30px;
+  font-size: 10px;
+  background-color: #333;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+/* Estilo para el panel deslizante */
+.slide-panel {
+  position: fixed;
+  top: 0;
+  right: -250px;  /* Cambiado para que no tape tanto */
+  width: 250px;  /* Ancho reducido */
+  height: 100%;
+  background-color: #333; /* Color gris para el panel */
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
+  overflow-y: auto;
+  transition: right 0.3s ease;
+  z-index: 5;
+}
+
+/* Cuando el panel esté abierto */
+.slide-panel.open {
+  right: 0;
+}
+
+      /* Sidebar */
+      #sidebar {
+        position: fixed;
+        top: 50px;
+        right: 0;
+        width: 170px;
+        height: calc(100% - 60px);
+        background-color: #2c2c2c;
+        color: #fff;
+        padding: 5px;
+        overflow-y: auto;
+        z-index: 1;
+      }
+
+      #sidebar .section {
+        margin-bottom: 10px;
+      }
+
+      #sidebar .section h3 {
+        font-size: 19px;
+        margin-bottom: 8px;
+        border-bottom: 1px solid #5866FF;
+        padding-bottom: 4px;
+      }
+
+      #sidebar .section button {
+        width: 100%;
+        background-color: #444;
+        border: none;
+        color: #27EBFF;
+        padding: 5px;
+        margin-bottom: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+      }
+
+      #sidebar .section button i {
+        margin-right: 8px;
+      }
+
+      #sidebar .section button:hover {
+        background-color: #555;
+      }
+      .section {
+  margin-bottom: 20px;
+}
+
+.section button {
+  padding: 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+    #transform-controls button {
+      background-color: #555;
+      color: white;
+      border: none;
+      padding: 10px;
+      margin: 5px;
+      cursor: pointer;
+      width: 10px;
+      height: 10px;
+    }
+    #transform-controls button:hover {
+      background-color: #777;
+    }
+    #transform-controls button i {
+      font-size: 1px;
+    }
+    /* Efecto hover en los botones */
+#search-options button:hover {
+  background-color: #5a5a5a;
+}
+
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+
+
+<!-- Casilla para activar/desactivar el GridHelper -->
+<div>
+
+</div>
+
+  </div>
+</div>
+
+<!-- Botones de TransformControls -->
+<div id="transformControlsIcons">
+    <button id="moveMode"><i class="fas fa-arrows-alt"></i></button>
+    <button id="rotateMode"><i class="fas fa-sync-alt"></i></button>
+    <button id="scaleMode"><i class="fas fa-expand"></i></button>
+    
+    <!-- Botón para copiar el objeto con TransformControls -->
+<button id="copy-object">
+  <i class="fas fa-copy"></i>  <!-- Ícono de copiar de FontAwesome -->
+</button>
+<!-- Botón para borrar el objeto -->
+<button id="delete-object-button">
+  <i class="fa fa-trash"></i> 
+</button>
+<!-- Botón para el Top Panel -->
+<button id="toggleTopPanel" style="position: fixed; top: 170px; left: 1px;">h</button>
+
+
+</div>
+
+<!-- Asegúrate de cargar FontAwesome -->
+  <div id="top-panel">
+
+
+      
+    <button id="add-button">Add</button>
+    <!-- Botón de animación -->
+<button id="toggleAnimation" >Animación</button>
+
+    <!-- Botón para abrir el panel de vistas -->
+<button id="vistaButton" >View</button>
+
+<!-- Panel de vistas -->
+<div id="perspectiveMenu" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(0, 0, 0, 0.7); padding: 20px; border-radius: 10px;">
+    <button data-perspective="X">X</button>
+    <button data-perspective="Y">Y</button>
+    <button data-perspective="Z">Z</button>
+    <button data-perspective="-X">-X</button>
+    <button data-perspective="-Y">-Y</button>
+    <button data-perspective="-Z">-Z</button>
+</div>
+<button id="blockButton">
+  <i id="lockIcon" class="fas fa-lock-open"></i> Block
+</button>
+
+<!-- Botón para abrir el panel de objetos -->
+<button id="sceneButton" >Scene</button>
+
+<!-- Panel deslizable de lista de objetos -->
+<div id="scenePanel" style="display: none; position: fixed; top: 50px; left: 10px; background: #333; color: #fff; padding: 10px; border-radius: 5px; width: 300px; max-height: 400px; overflow-y: auto;">
+  <h3 style="margin: 0;">Objects in Scene</h3>
+  <ul id="sceneObjectList" style="list-style: none; padding: 0; margin: 0;"></ul>
+</div>
+
+<!-- Menú del objeto -->
+<div id="objectMenu" style="display: none; position: fixed; top: 70%; left: 70%; transform: translate(-100%, -90%); background: #444; color: #fff; padding: 20px; border-radius: 5px; width: 300px;">
+  <h3 style="margin: 0 0 10px; text-align: center;">Object Menu</h3>
+  <label for="renameInput">Rename Object:</label>
+  <input type="text" id="renameInput" style="margin: 5px 0; width: 100%; padding: 5px;" />
+  <button id="addToGroupButton" style="width: 100%; margin: 5px 0;">Add to Group</button>
+  <button id="confirmGroupButton" style="width: 100%; margin: 5px 0; display: none;">Confirm Group</button>
+  
+  <button id="closeMenuButton" style="width: 100%; margin: 5px 0;">Close</button>
+</div>
+
+    <!-- Botón Hamburguesa -->
+<button id="menu-button" onclick="toggleSidebar()">
+  menu</span>
+  <span></span>
+  <span></span>
+</button>
+  </div>
+
+  <div id="add-menu">
+    
+    <button id="mesh-button">Mesh</button>
+    <button id="light-button">Light</button>
+    <button id="effects-button">Effects</button>
+<div id="water-menu" style="display:none;">
+</div>
+
+
+    <div id="mesh-options">
+      <button class="add-object" data-type="cube">Cube</button>
+      <button class="add-object" data-type="sphere">Sphere</button>
+      <button class="add-object" data-type="cylinder">Cylinder</button>
+      <button class="add-object" data-type="plane">Plane</button>
+      <button class="add-object" data-type="cone">Cone</button>
+      <button class="add-object" data-type="deformed">Deformed Shape</button>
+    </div>
+    <div id="light-options">
+      <div id="shadow-type-menu" style="margin-top: 10px;">
+  <label for="shadow-type-select" style="color: white;">Tipo de Sombra:</label>
+  <select id="shadow-type-select">
+    <option value="PCFSoftShadowMap">Soft Shadow (Suave)</option>
+    <option value="PCFShadowMap">PCF Shadow (Estándar)</option>
+    <option value="VSMShadowMap">VSM Shadow (Variable)</option>
+    <option value="BasicShadowMap">Basic Shadow (Básico)</option>
+  </select>
+</div>
+      <button class="add-light" data-type="directional">Directional Light</button>
+      <button class="add-light" data-type="point">Point Light</button>
+      <button class="add-light" data-type="spot">Spot Light</button>
+      <div id="light-settings" style="display:none;">
+        <label for="light-color">Color:</label>
+        <input type="color" id="light-color">
+        <label for="light-intensity">Intensity:</label>
+        <input type="range" id="light-intensity" min="0" max="2" step="0.1" value="1">
+        <label for="light-shadow">Shadow:</label>
+        <input type="checkbox" id="light-shadow">
+        <label for="shadow-softness">Shadow Softness:</label>
+        <input type="range" id="shadow-softness" min="0" max="1" step="0.1" value="0.5">
+        
+        <div id="shadow-menu" style="display:none; position: fixed; top: 100px; right: 100px; background-color: #333; padding: 10px; border-radius: 5px; color: white;">
+  <button id="enable-shadow">Sí</button>
+  <button id="disable-shadow">No</button>
+  <div id="shadow-options" style="display:none; margin-top: 10px;">
+    <button id="cast-shadow">Emitir</button>
+    <button id="receive-shadow">Recibir</button>
+    <button id="both-shadow">Ambos</button>
+  </div>
+</div>
+<button id="shadow-button" >Sombra</button>
+
+      </div>
+    </div>
+    
+  </div>
+    <!-- Sidebar -->
+    <div id="sidebar">
+      <div class="section">
+
+       <div id="parentControl">
+  <button id="parentButton">Parent</button>
+  <div id="parentMenu" style="display: none;">
+    <p>Selecciona:</p>
+    <button id="setParent">Madre</button>
+    <button id="setChild">Hijo</button>
+    <button id="confirmParenting">Confirmar Emparentado</button>
+    
+    
+  </div>
+    <div class="section">
+  <button id="renderVideoButton">Render Video</button>
+</div>
+<!-- Botón "File" -->
+<button id="fileButton">File</button>
+
+<!-- Menú desplegable de "File" -->
+<div id="fileMenu" style="display: none;">
+  <!-- Botón para abrir el menú de materiales -->
+<button id="objMaterialBtn">Obj Material</button>
+
+<!-- Menú para ajustar el material -->
+<div id="materialPanel" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: #333; color: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);">
+  <h3>Editar Material</h3>
+  
+  <!-- Controles para color -->
+  <label for="color">Color:</label>
+  <input type="color" id="color" value="#ffffff" /><br><br>
+
+  <!-- Controles para transparencia -->
+  <label for="transparency">Transparencia:</label>
+  <input type="range" id="transparency" min="0" max="1" step="0.1" value="1" /><br><br>
+
+  <!-- Controles para emisividad -->
+  <label for="emissive">Emisividad:</label>
+  <input type="color" id="emissive" value="#000000" /><br><br>
+
+  <!-- Controles para color de emisividad -->
+  <label for="emissiveColor">Color de Emisividad:</label>
+  <input type="color" id="emissiveColor" value="#ffffff" /><br><br>
+
+  <!-- Controles para sombras -->
+  <label for="shadow">Activar Sombras:</label>
+  <input type="checkbox" id="shadow" checked /><br><br>
+
+  <!-- Botones -->
+  <button id="applyMaterialBtn">Aplicar Material</button>
+  <button id="closePanelBtn">Cerrar</button>
+</div>
+
+  <!-- Botón para mostrar la lista de objetos -->
+<button id="lista-obj-button">Lista de OBJ</button>
+
+<!-- Lista de objetos importados (oculta al principio) -->
+<ul id="lista-obj" style="display:none;"></ul>
+
+<!-- Input para seleccionar el archivo, oculto -->
+<input type="file" id="file-input" accept=".obj" style="display: none;">
+
+  <!-- Botón para cargar el archivo -->
+<button id="import-obj-button">Importar OBJ</button>
+
+<!-- Input para seleccionar el archivo, oculto -->
+<input type="file" id="file-input" accept=".obj" style="display: none;">
+
+  <button id="newButton">New</button>
+  
+  <!-- Menú desplegable de "New" -->
+  <div id="newMenu" style="display: none;">
+    <button id="importVideoButton">Importar Video</button>
+<input type="file" id="videoFileInput" accept="video/*" style="display:none;">
+
+    <button id="button2D">2D</button>
+    <button id="button3D">3D</button>
+  </div>
+</div>
+<!-- Mensaje de estado -->
+<p id="statusMessage" style="font-weight: bold;"></p>
+
+<!-- Modal para mostrar el video grabado -->
+<div id="videoModal" style="display: none; margin-top: 20px;">
+  <video id="recordedVideo" controls style="width: 100%;"></video>
+  <a id="downloadLink" href="#" style="display: none; margin-top: 10px;">Descargar Video</a>
+  <button id="copyLinkButton" style="display: none;">Copiar Enlace</button>
+</div>
+</div>
+
+           <h3>materiales</h3>
+    <button id="colorButton" class="color-btn">Seleccionar color</button>
+    <button id="textureButton" class="texture-btn">Seleccionar Textura</button>
+<input type="file" id="textureInput" style="display:none;" accept="image/*" />
+<button id="transparencyButton">Ajustar Transparencia</button>
+<div id="transparencyMenu" style="display:none;">
+  <label for="transparencySlider">Transparencia:</label>
+  <input type="range" id="transparencySlider" min="0" max="1" step="0.01" value="1">
+  <span id="transparencyValue">1</span>
+</div>
+
+
+<button id="emissionButton" class="emission-btn">Emisión</button>
+<input type="color" id="emissionColor" style="display:none;" />
+<input type="range" id="emissionStrength" min="0" max="10" step="0.1" value="1" style="display:none;" />
+<input type="color" id="colorPicker" style="display:none;" />
+
+
+
+
+
+
+<button id="roughnessButton">Cargar Textura de Rugosidad</button>
+<input type="file" id="roughnessInput" style="display:none;" accept="image/*">
+<!-- Botón para aplicar el contorno y mostrar/ocultar el menú -->
+<button id="outline-button">Contorno</button>
+
+<!-- Controles para modificar las propiedades del contorno -->
+<div id="outline-controls" style="display: none;">
+  <label for="outline-color">Color del Contorno:</label>
+  <input type="color" id="outline-color" value="#ff0000">
+
+  <label for="outline-emissive">Emisividad:</label>
+  <input type="range" id="outline-emissive" min="0" max="1" step="0.1" value="0.5">
+
+  <label for="outline-size">Tamaño del Contorno:</label>
+  <input type="range" id="outline-size" min="0.01" max="0.2" step="0.01" value="0.05">
+</div>
+
+<!-- Botones de control -->
+<div id="controls">
+  <button id="make-visible-button">Make Object Visible Always</button>
+  <button id="restore-visibility-button">Restore Visibility</button>
+</div>
+<!-- Botón para activar el modo de edición de caras -->
+<button id="cube-faces-button">Cube Faces</button>
+
+<!-- Menú para editar texturas de caras -->
+<div id="cube-faces-menu" style="display: none;">
+  <h3>Editar Cara</h3>
+  <div id="face-textures"></div>
+  <input type="file" id="upload-texture" accept="image/*" style="display: none;" />
+</div>
+
+<h3>avanzados</h3>
+<button id="oceanButton">Añadir Océano</button>
+
+<div id="oceanMenu" style="display: none;">
+    <label for="oceanColor">Color:</label>
+    <input type="color" id="oceanColor" value="#1e90ff"><br>
+
+    <label for="oceanTransparency">Transparencia:</label>
+    <input type="range" id="oceanTransparency" min="0.1" max="1" step="0.1" value="0.8"><br>
+
+    <label for="oceanTexture">Textura:</label>
+    <input type="file" id="oceanTexture" accept="image/*"><br>
+
+    <label for="oceanSpeed">Velocidad:</label>
+    <input type="range" id="oceanSpeed" min="0.1" max="5" step="0.1" value="1"><br>
+
+    <label for="oceanStrength">Fuerza:</label>
+    <input type="range" id="oceanStrength" min="0.1" max="5" step="0.1" value="1"><br>
+
+    <label for="oceanParticlesCount">Cantidad de partículas:</label>
+    <input type="number" id="oceanParticlesCount" min="1000" max="5000" step="500" value="2000"><br>
+
+    <label for="oceanParticlesSize">Tamaño de partículas:</label>
+    <input type="range" id="oceanParticlesSize" min="0.5" max="3" step="0.1" value="1.5"><br>
+
+    <button id="applyOceanButton">Aplicar Océano</button>
+</div>
+
+<button id="rainButton">Añadir Lluvia</button>
+
+<div id="rainMenu" style="display: none;">
+    <label for="rainColor">Color:</label>
+    <input type="color" id="rainColor" value="#00aaff"><br>
+
+    <label for="rainTransparency">Transparencia:</label>
+    <input type="range" id="rainTransparency" min="0.1" max="1" step="0.1" value="0.5"><br>
+
+    <label for="rainQuantity">Cantidad:</label>
+    <input type="number" id="rainQuantity" min="100" max="5000" step="100" value="1000"><br>
+
+    <label for="rainExtent">Extensión:</label>
+    <input type="number" id="rainExtent" min="10" max="200" step="10" value="100"><br>
+
+    <label for="rainDirection">Dirección (grados):</label>
+    <input type="number" id="rainDirection" min="0" max="360" step="1" value="90"><br>
+
+    <label for="rainSpeed">Velocidad:</label>
+    <input type="number" id="rainSpeed" min="0.1" max="10" step="0.1" value="1"><br>
+
+    <button id="applyRainButton">Aplicar Lluvia</button>
+</div>
+<button id="snowButton">Añadir Nieve</button>
+
+<div id="snowMenu" style="display: none;">
+    <label for="snowColor">Color:</label>
+    <input type="color" id="snowColor" value="#ffffff"><br>
+
+    <label for="snowTransparency">Transparencia:</label>
+    <input type="range" id="snowTransparency" min="0.1" max="1" step="0.1" value="0.9"><br>
+
+    <label for="snowQuantity">Cantidad:</label>
+    <input type="number" id="snowQuantity" min="100" max="5000" step="100" value="500"><br>
+
+    <label for="snowExtent">Extensión:</label>
+    <input type="number" id="snowExtent" min="10" max="200" step="10" value="100"><br>
+
+    <label for="snowDirection">Dirección (grados):</label>
+    <input type="number" id="snowDirection" min="0" max="360" step="1" value="90"><br>
+
+    <label for="snowSpeed">Velocidad:</label>
+    <input type="number" id="snowSpeed" min="0.1" max="5" step="0.1" value="0.5"><br>
+
+    <button id="applySnowButton">Aplicar Nieve</button>
+</div>
+
+
+
+
+
+<button id="fireButton">Añadir Fuego</button>
+<div id="fireMenu" style="display:none;">
+  <label>Color: <input type="color" id="fireColor" value="#ff4500"></label><br>
+  <label>Tamaño: <input type="range" id="fireSize" min="1" max="10" step="0.1" value="5"></label><br>
+  <label>Velocidad: <input type="range" id="fireSpeed" min="0.1" max="2" step="0.1" value="1"></label><br>
+  <label>Opacidad: <input type="range" id="fireOpacity" min="0.1" max="1" step="0.1" value="1"></label><br>
+  <label>Intensidad: <input type="range" id="fireIntensity" min="0.1" max="5" step="0.1" value="1"></label><br>
+  <label>Cantidad: <input type="number" id="fireQuantity" min="100" max="5000" step="100" value="1000"></label><br>
+  <button id="fireConfirmButton">Confirmar</button>
+</div>
+
+<!-- Botón para mostrar el menú de cabello -->
+
+<button id="hairButton">Hair</button>
+
+<!-- Menú de configuración de cabello -->
+<div id="hairMenu" style="display: none; background-color: #444; padding: 10px; color: white; border: 1px solid #555; border-radius: 5px;">
+  <label for="hairLength">Largo:</label>
+  <input type="range" id="hairLength" min="0.01" max="10" step="0.01" value="0.1"><br>
+  
+  <label for="hairThickness">Grueso:</label>
+  <input type="range" id="hairThickness" min="0.01" max="2" step="0.01" value="0.1"><br>
+  
+  <label for="hairCount">Cantidad:</label>
+  <input type="number" id="hairCount" min="1" max="1000" step="10" value="50"><br>
+  
+  <label for="hairDirection">Dirección (grados):</label>
+  <input type="number" id="hairDirection" value="0" step="1"><br>
+  
+  <label for="hairColor">Color:</label>
+  <input type="color" id="hairColor" value="#000000"><br>
+  
+  <!-- Botón para confirmar cambios -->
+  <button id="applyHairButton" style="margin-top: 10px;">Confirmar Cambios</button>
+  
+</div>
+<button id="smokeButton">Humo</button>
+
+<!-- Menú para configurar el humo -->
+<div id="smokeMenu" style="display:none; position:absolute; background:#ccc; padding:10px; border:1px solid #000;">
+  <label for="smokeColor">Color:</label>
+  <input type="color" id="smokeColor" value="#888888"><br>
+
+  <label for="smokeTransparency">Transparencia:</label>
+  <input type="range" id="smokeTransparency" min="0" max="1" step="0.1" value="0.5"><br>
+
+  <label for="smokeHeight">Altura:</label>
+  <input type="number" id="smokeHeight" min="1" max="10" value="5"><br>
+
+  <label for="smokeDirection">Dirección (en grados):</label>
+  <input type="number" id="smokeDirection" min="0" max="360" value="0"><br>
+
+  <label for="smokeAmount">Cantidad:</label>
+  <input type="number" id="smokeAmount" min="1" max="50" value="10"><br>
+
+  <label for="smokeSpeed">Velocidad:</label>
+  <input type="number" id="smokeSpeed" min="0.01" max="0.1" step="0.01" value="0.03"><br>
+
+  <button id="confirmSmoke">Confirmar</button>
+</div>
+<h3>background</h3>
+
+
+<button id="changeBgColorButton">Change Background</button>
+<input type="color" id="bgColorPicker" style="display:none;">
+<button id="changeBgTextureButton">Set Background Texture</button>
+<input type="file" id="bgTextureInput" accept="image/*" style="display:none;">
+<button id="setBgVideoButton">Set Background Video</button>
+<input type="file" id="bgVideoInput" accept="video/*" style="display:none;">
+<button id="adjustLightButton">Ajustar Intensidad de Luz</button>
+<input type="range" id="lightIntensitySlider" min="0" max="2" step="0.1" value="1" style="display:none;">
+<h3>control</h3>
+<h3>volume experimental</h3>
+
+
+<button id="volume-button" >Volume</button>
+<div id="volume-controls"
+  <label for="particle-density">Densidad de partículas:</label>
+  <input type="number" id="particle-density" min="100" max="5000" step="100" value="1000"><br><br>
+
+  <label for="particle-size">Tamaño de partículas:</label>
+  <input type="range" id="particle-size" min="0.1" max="5" step="0.1" value="1"><br><br>
+
+  <label for="volume-color">Color:</label>
+  <input type="color" id="volume-color" value="#ffffff"><br><br>
+
+  <label for="volume-opacity">Opacidad:</label>
+  <input type="range" id="volume-opacity" min="0" max="1" step="0.1" value="0.5"><br><br>
+
+  <button id="apply-volume">Aplicar</button>
+</div>
+
+<h3>agua experimental</h3>
+
+  <button id="water-button">Water</button>
+  <div id="water-options">
+    <label for="wave-strength">Wave Strength:</label>
+    <input type="range" id="wave-strength" min="0" max="5" step="0.1" value="1">
+    <label for="wave-speed">Wave Speed:</label>
+    <input type="range" id="wave-speed" min="0" max="5" step="0.1" value="1">
+    <label for="wave-color">Wave Color:</label>
+    <input type="color" id="wave-color" value="#00aaff">
+  </div>
+  <!-- Botones para escalar y rotar el objeto -->
+<button id="scale-button">Escalar</button>
+<button id="rotate-button">Rotar</button>
+<!-- Botón para mover (trasladar) el objeto -->
+<button id="translate">Mover</button>
+
+  <div id="water-controls" style="display:none;">
+  <label for="waterX">Posición X: <input type="number" id="waterX" value="0" step="0.1"></label><br>
+  <label for="waterY">Posición Y: <input type="number" id="waterY" value="0" step="0.1"></label><br>
+  <label for="waterZ">Posición Z: <input type="number" id="waterZ" value="0" step="0.1"></label><br>
+  <button id="applyWaterPosition">Aplicar Posición</button>
+  </div>
+  <h3>controles</h3>
+  <p>ccolor(c)</p>
+      <button id="ccolorButton">ccolor</button>
+<button id="okButton" style="display:none;">OK</button>
+  <!-- Botón para añadir partículas -->
+<p>ctransform(c)</p>
+<!-- Botón para crear el cubo de transformación -->
+<button id="ttransformButton">ttransform</button>
+
+
+<!-- Botones de dirección -->
+<div id="direction-buttons">
+
+  <!-- Botones para las esquinas -->
+  <button id="topLeftButton">Esquina Superior Izquierda</button>
+  <button id="topRightButton">Esquina Superior Derecha</button>
+  <button id="bottomLeftButton">Esquina Inferior Izquierda</button>
+  <button id="bottomRightButton">Esquina Inferior Derecha</button>
+  <!-- Botón para el centro -->
+  <button id="centerButton">Centro</button>
+  <!-- Botón para confirmar la posición inicial del cubo -->
+<button id="okTransformButton" style="display:none;">OK</button>
+
+  <button id="moveFrameAndCubeButton">Mover Marco</button>
+</div>
+<h3>line</h3>
+    <!-- Botón Line -->
+<button id="line-button" >Line</button>
+<!-- Menú para la configuración de la línea -->
+
+  <label for="line-points">Número de Puntos:</label>
+  <input type="number" id="line-points" min="2" value="3" style="width: 50px;">
+  <button id="create-line-button" style="margin-top: 5px;">Crear Línea</button>
+  
+  <hr style="margin: 10px 0; border: 1px solid white;">
+  
+  <!-- Selección de puntos -->
+  <button id="prev-point-button"><</button>
+  <button id="next-point-button">></button>
+  
+  <hr style="margin: 10px 0; border: 1px solid white;">
+  
+  <!-- Aplicar forma -->
+  <label for="line-shape">Forma:</label>
+  <select id="line-shape">
+    <option value="cube">Cubo</option>
+    <option value="cylinder">Cilindro</option>
+  </select>
+  <button id="apply-shape-button" style="margin-top: 5px;">Aplicar Forma</button>
+
+<h3>render</h3>
+    <label for="grid-helper-checkbox"> GridHelper</label>
+  <input type="checkbox" id="grid-helper-checkbox" checked>
+</div>
+
+ <label for="grid-helper-checkbox"> lightobj</label>
+  <input type="checkbox" id="luzVisualCheckbox" checked>
+  
+  <label for="transformControlCheckbox">TransformControls</label>
+<input type="checkbox" id="transformControlCheckbox" checked>
+<label>
+  <input type="checkbox" id="toggleFrame" checked> ctransform <label>
+  <input type="checkbox" id="toggleControlCube" checked> ccolor
+</label>
+
+</label>
+
+  </div>
+  
+      <!-- Timeline -->
+    <div id="timeline">
+      <div id="blenderTimeline" style="position: fixed; bottom: 0; left: 0; width: 100%; height: 90px; background-color: #2c2c2c; border-top: 1px solid #444; display: flex; flex-direction: column;">
+  <!-- Barra de herramientas -->
+  <div id="timelineToolbar" style="height: 40px; display: flex; align-items: center; justify-content: space-between; background-color: #333; padding: 5px;">
+    <div style="display: flex; gap: 10px;">
+      <button id="btnFirstFrame" title="Ir al fotograma inicial"><i class="fas fa-step-backward"></i></button>
+      <button id="btnPreviousFrame" title="Fotograma anterior"><i class="fas fa-chevron-left"></i></button>
+      <button id="btnPlay" title="Reproducir"><i class="fas fa-play"></i></button>
+      <button id="btnPause" title="Pausar"><i class="fas fa-pause"></i></button>
+      <button id="btnNextFrame" title="Fotograma siguiente"><i class="fas fa-chevron-right"></i></button>
+      <button id="btnLastFrame" title="Ir al último fotograma"><i class="fas fa-step-forward"></i></button>
+    </div>
+    <div>
+  <label id="fpsLabel">FPS: 24</label>
+  <input type="number" id="fpsInput" value="24" min="1">
+</div>
+<div>
+  <label id="totalFramesLabel">Total de fotogramas: 214</label>
+  <input type="number" id="totalFramesInput" value="214" min="1">
+</div>
+
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <button id="btnAddKeyframe" title="Añadir keyframe manual"><i class="fas fa-plus"></i> Keyframe</button>
+
+
+      </label>
+    </div>
+  </div>
+  <!-- Contenedor del timeline -->
+  <div id="timelineContainer" style="flex: 1; overflow-x: auto; position: relative; background-color: #2c2c2c;">
+    <div id="timelineFrames" style="position: relative; height: 100%; width: 2000px;">
+      <div id="frameLines" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></div>
+      <div id="keyframeMarkers" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>
+      <div id="currentFrameMarker" class="current-frame"></div>
+    </div>
+
+
+  
+  <script>
+// Escena, cámara y renderizador
+const scene = new THREE.Scene();
+
+// Configura la cámara
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+// Renderizador con antialiasing activado
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight); 
+renderer.setPixelRatio(window.devicePixelRatio); // Mejora la suavidad visual en pantallas de alta densidad de píxeles
+document.body.appendChild(renderer.domElement);
+
+    
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+// Mejorar la calidad de las sombras
+renderer.shadowMap.width = 2048;  // Resolución más alta de la sombra
+renderer.shadowMap.height = 2048; // Resolución más alta de la sombra
+
+// Redimensionar el renderizador cuando cambie el tamaño de la ventana
+window.addEventListener('resize', () => {
+  setResolution(window.innerWidth, window.innerHeight);
+});
+
+  // Opcional: Configurar el antialias para suavizar los bordes
+  renderer.antialias = true;
+
+    // Habilitar sombras en el renderizador
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    // Fondo blanco y GridHelper
+    scene.background = new THREE.Color(0xffffff);
+   const gridHelper = new THREE.GridHelper(50, 50);
+scene.add(gridHelper);  // Asegúrate de añadirlo a la escena, pero no a los TransformControls
+
+
+    // Cámara y controles
+    camera.position.set(30, 50, 50);
+    camera.rotation.x = -Math.PI / 4;
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+    // Raycaster y mouse
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    // Función de animación
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // TransformControls
+    const transformControls = new THREE.TransformControls(camera, renderer.domElement);
+    scene.add(transformControls);
+
+
+// Suponiendo que ya tienes transformControls configurado y el objeto seleccionado
+const colorButton = document.getElementById('colorButton');
+const colorPicker = document.getElementById('colorPicker');
+
+// Mostrar el selector de color cuando se presione el botón
+colorButton.addEventListener('click', function() {
+  colorPicker.click();
+});
+
+// Suponiendo que ya tienes transformControls configurado y el objeto seleccionado
+const textureButton = document.getElementById('textureButton');
+const textureInput = document.getElementById('textureInput');
+
+// Mostrar el selector de archivos cuando se presiona el botón
+textureButton.addEventListener('click', function() {
+  textureInput.click();
+});
+
+const transparencyButton = document.getElementById('transparencyButton');
+const transparencySlider = document.getElementById('transparencySlider');
+
+
+// Ajustar la transparencia del objeto seleccionado con TransformControls
+transparencySlider.addEventListener('input', function(event) {
+  if (transformControls.object) {
+    const selectedObject = transformControls.object;
+
+    // Obtener el valor del slider
+    const transparencyValue = event.target.value;
+
+    // Ajustar la transparencia
+    selectedObject.material.transparent = true;
+    selectedObject.material.opacity = transparencyValue;  // Cambiar la opacidad
+    selectedObject.material.needsUpdate = true;
+  }
+});
+const emissionButton = document.getElementById('emissionButton');
+const emissionColor = document.getElementById('emissionColor');
+const emissionStrength = document.getElementById('emissionStrength');
+
+// Mostrar u ocultar los controles de emisión al presionar el botón
+emissionButton.addEventListener('click', function() {
+  emissionColor.style.display = emissionColor.style.display === 'none' ? 'block' : 'none';
+  emissionStrength.style.display = emissionStrength.style.display === 'none' ? 'block' : 'none';
+});
+
+// Cambiar el color de emisión del objeto seleccionado
+emissionColor.addEventListener('input', function(event) {
+  if (transformControls.object) {
+    const selectedObject = transformControls.object;
+
+    // Establecer el color de emisión
+    selectedObject.material.emissive = new THREE.Color(event.target.value);
+    selectedObject.material.needsUpdate = true;
+  }
+});
+
+// Cambiar la fuerza de la emisión del objeto seleccionado
+emissionStrength.addEventListener('input', function(event) {
+  if (transformControls.object) {
+    const selectedObject = transformControls.object;
+
+    // Establecer la intensidad de la emisión
+    selectedObject.material.emissiveIntensity = event.target.value;
+    selectedObject.material.needsUpdate = true;
+  }
+});
+
+// Cuando se selecciona una imagen, cargarla y aplicarla como textura
+textureInput.addEventListener('change', function(event) {
+  if (event.target.files && event.target.files[0]) {
+    const file = event.target.files[0];
+    
+    // Crear un objeto URL para la imagen seleccionada
+    const textureURL = URL.createObjectURL(file);
+
+    // Crear una textura a partir de la imagen seleccionada
+    const textureLoader = new THREE.TextureLoader();
+    const texture = textureLoader.load(textureURL, function() {
+      // Verificar si el objeto tiene transformControls y un material
+      if (transformControls.object) {
+        const selectedObject = transformControls.object;
+
+        // Aplicar la textura al objeto (suponiendo que el objeto tiene un material)
+        selectedObject.material.map = texture;
+
+        // Si la imagen tiene transparencia (alpha), asegúrate de habilitarla
+        if (texture.format === THREE.RGBAFormat) {
+          selectedObject.material.transparent = true;
+          selectedObject.material.alphaTest = 0.5;  // Ajuste del umbral de transparencia
+        }
+
+        selectedObject.material.needsUpdate = true;
+      }
+    });
+  }
+});
+
+// Cuando el usuario elija un color, aplicarlo al objeto seleccionado
+colorPicker.addEventListener('input', function(event) {
+  // Verificar si hay un objeto seleccionado
+  if (transformControls.object) {
+    const selectedObject = transformControls.object;
+
+    // Obtener el color seleccionado
+    const selectedColor = event.target.value;
+
+    // Aplicar el color al material del objeto (suponiendo que el objeto tiene un material)
+    selectedObject.material.color.set(selectedColor);
+
+    // Si deseas que el color se mantenga en el objeto (por ejemplo, para objetos con malla), realiza este ajuste.
+    selectedObject.material.needsUpdate = true;
+  }
+});
+
+    // Funciones de interacción del menú
+    const addButton = document.getElementById("add-button");
+    const addMenu = document.getElementById("add-menu");
+    const meshButton = document.getElementById("mesh-button");
+    const lightButton = document.getElementById("light-button");
+    const meshOptions = document.getElementById("mesh-options");
+    const lightOptions = document.getElementById("light-options");
+    const lightSettings = document.getElementById("light-settings");
+
+    // Mostrar/ocultar el menú de "Add"
+    addButton.addEventListener("click", () => {
+      addMenu.style.display = addMenu.style.display === "block" ? "none" : "block";
+    });
+
+// Seleccionar los botones
+const moveButton = document.getElementById("moveMode");
+const rotateButton = document.getElementById("rotateMode");
+const scaleButton = document.getElementById("scaleMode");
+
+// Configurar eventos de clic
+moveButton.addEventListener("click", () => {
+    transformControls.setMode("translate"); // Modo mover
+});
+rotateButton.addEventListener("click", () => {
+    transformControls.setMode("rotate"); // Modo rotar
+});
+scaleButton.addEventListener("click", () => {
+    transformControls.setMode("scale"); // Modo escalar
+});
+
+const hairButton = document.getElementById("hairButton");
+const hairMenu = document.getElementById("hairMenu");
+const applyHairButton = document.getElementById("applyHairButton");
+
+// Mostrar/ocultar el menú al presionar el botón "Hair"
+hairButton.addEventListener("click", () => {
+  hairMenu.style.display = hairMenu.style.display === "block" ? "none" : "block";
+});
+
+// Confirmar y aplicar el cabello al objeto seleccionado
+applyHairButton.addEventListener("click", () => {
+  if (!transformControls.object) {
+    alert("Por favor, selecciona un objeto primero.");
+    return;
+  }
+
+  const selectedObject = transformControls.object;
+  const hairLength = parseFloat(document.getElementById("hairLength").value);
+  const hairThickness = parseFloat(document.getElementById("hairThickness").value);
+  const hairDirection = parseFloat(document.getElementById("hairDirection").value);
+  const hairColor = document.getElementById("hairColor").value;
+  const hairCount = parseInt(document.getElementById("hairCount").value);
+
+  // Verificar si el objeto tiene geometría válida
+  if (!selectedObject.geometry) {
+    alert("El objeto seleccionado no tiene geometría.");
+    return;
+  }
+
+  // Calcular el bounding box y normales
+  const geometry = selectedObject.geometry.clone();
+  geometry.applyMatrix4(selectedObject.matrixWorld); // Transformar al espacio mundial
+  const positions = geometry.attributes.position.array;
+  const normals = geometry.attributes.normal.array;
+
+  // Crear grupo de cabello
+  const hairMaterial = new THREE.MeshStandardMaterial({ color: hairColor });
+  const hairGroup = new THREE.Group();
+
+  for (let i = 0; i < hairCount; i++) {
+    const vertexIndex = Math.floor(Math.random() * (positions.length / 3)) * 3;
+
+    // Obtener posición y normal
+    const position = new THREE.Vector3(
+      positions[vertexIndex],
+      positions[vertexIndex + 1],
+      positions[vertexIndex + 2]
+    );
+
+    const normal = new THREE.Vector3(
+      normals[vertexIndex],
+      normals[vertexIndex + 1],
+      normals[vertexIndex + 2]
+    ).normalize();
+
+    // Generar geometría y posición del cabello
+    const hairGeometry = new THREE.CylinderGeometry(hairThickness, hairThickness, hairLength, 8);
+    const hairMesh = new THREE.Mesh(hairGeometry, hairMaterial);
+
+    // Posicionar el cabello sobre la superficie
+    hairMesh.position.copy(position.clone().add(normal.clone().multiplyScalar(hairThickness / 2)));
+
+    // Orientar el cabello hacia la normal
+    const up = new THREE.Vector3(0, 1, 0);
+    const quaternion = new THREE.Quaternion().setFromUnitVectors(up, normal);
+    hairMesh.setRotationFromQuaternion(quaternion);
+
+    // Aplicar dirección (rotación en el eje Y)
+    hairMesh.rotation.y += THREE.MathUtils.degToRad(hairDirection);
+
+    hairGroup.add(hairMesh);
+  }
+
+  // Añadir el grupo de cabello al objeto
+  selectedObject.add(hairGroup);
+  alert(`Cabello añadido: ${hairCount} hebras.`);
+});
+
+
+
+      // Evento para congelar y descongelar la cámara
+      transformControls.addEventListener('mouseDown', () => controls.enabled = false);
+      transformControls.addEventListener('mouseUp', () => controls.enabled = true);
+    // Mostrar/ocultar las opciones de "Mesh" y "Light"
+    meshButton.addEventListener("click", () => {
+      meshOptions.style.display = meshOptions.style.display === "block" ? "none" : "block";
+      lightOptions.style.display = "none";
+    });
+    lightButton.addEventListener("click", () => {
+      lightOptions.style.display = lightOptions.style.display === "block" ? "none" : "block";
+      meshOptions.style.display = "none";
+    });
+
+
+// Mostrar/ocultar el menú de Water al hacer clic en Effects
+document.getElementById('effects-button').addEventListener('click', function() {
+  const waterMenu = document.getElementById('water-menu');
+  waterMenu.style.display = waterMenu.style.display === 'none' ? 'block' : 'none';
+});
+const bgColorButton = document.getElementById("changeBgColorButton");
+const bgColorPicker = document.getElementById("bgColorPicker");
+
+// Mostrar el selector de color al hacer clic en el botón
+bgColorButton.addEventListener("click", () => {
+  bgColorPicker.click();
+});
+
+// Cambiar el color del fondo al seleccionar un color
+bgColorPicker.addEventListener("input", (event) => {
+  const color = event.target.value;
+  scene.background = new THREE.Color(color);
+});
+
+let waterMesh
+// Crear el plano de agua y añadirlo a la escena al hacer clic en Water
+document.getElementById('water-button').addEventListener('click', function() {
+  const waveStrength = parseFloat(document.getElementById('wave-strength').value);
+  const waveSpeed = parseFloat(document.getElementById('wave-speed').value);
+  const waveColor = document.getElementById('wave-color').value;
+
+  const waterGeometry = new THREE.PlaneGeometry(50, 50, 100, 100);
+  const waterMaterial = new THREE.ShaderMaterial({
+    uniforms: {
+      time: { value: 0 },
+      waveStrength: { value: waveStrength },
+      waveSpeed: { value: waveSpeed },
+      waveColor: { value: new THREE.Color(waveColor) },
+      resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
+    },
+    vertexShader: `
+      uniform float time;
+      uniform float waveStrength;
+      uniform float waveSpeed;
+      uniform vec2 resolution;
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        vec3 pos = position;
+        float wave1 = sin(pos.x * 0.2 + time * waveSpeed) * waveStrength;
+        float wave2 = cos(pos.y * 0.3 + time * waveSpeed * 1.5) * waveStrength;
+        pos.z += wave1 + wave2;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+      }
+    `,
+    fragmentShader: `
+      uniform vec3 waveColor;
+      varying vec2 vUv;
+      void main() {
+        vec3 color = mix(waveColor, vec3(0.0, 0.3, 0.5), vUv.y);
+        gl_FragColor = vec4(color, 1.0);
+      }
+    `,
+    side: THREE.DoubleSide,
+    transparent: true
+  });
+
+  const waterMesh = new THREE.Mesh(waterGeometry, waterMaterial);
+  waterMesh.rotation.x = -Math.PI / 2;
+  waterMesh.position.set(0, 0, 0);
+  scene.add(waterMesh);
+
+  // Mostrar los controles de agua para ajustar la posición
+  document.getElementById('water-controls').style.display = 'block';
+
+  // Animar el agua
+  function animateWater() {
+    waterMaterial.uniforms.time.value += 0.05;
+    waterMaterial.uniforms.waveStrength.value = waveStrength;
+    waterMaterial.uniforms.waveSpeed.value = waveSpeed;
+    waterMaterial.uniforms.waveColor.value.set(waveColor);
+    requestAnimationFrame(animateWater);
+  }
+  animateWater();
+
+  // Función para seleccionar el objeto y aplicar los controles de transformación existentes
+  function selectObject(event) {
+    const rect = renderer.domElement.getBoundingClientRect();
+    const mouse = new THREE.Vector2();
+    mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    const raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects([waterMesh]);
+
+    if (intersects.length > 0) {
+      const selectedObject = intersects[0].object;
+      transformControls.attach(selectedObject); // Adjuntar los controles de transformación al objeto seleccionado
+    }
+  }
+
+  // Añadir el listener para detectar clics y seleccionar el objeto
+  renderer.domElement.addEventListener('click', selectObject);
+
+  // Ajustar la posición del agua al hacer clic en "Aplicar Posición"
+  document.getElementById('applyWaterPosition').addEventListener('click', function() {
+    // Obtener las posiciones de los inputs
+    const waterX = parseFloat(document.getElementById('waterX').value);
+    const waterY = parseFloat(document.getElementById('waterY').value);
+    const waterZ = parseFloat(document.getElementById('waterZ').value);
+
+    // Aplicar las posiciones al objeto de agua
+    waterMesh.position.set(waterX, waterY, waterZ);
+  });
+
+  // Asegurarse de que los botones existen antes de añadirles eventos
+  const rotateButton = document.getElementById('rotate-button');
+  const scaleButton = document.getElementById('scale-button');
+
+  if (rotateButton) {
+    rotateButton.addEventListener('click', function() {
+      transformControls.setMode('rotate'); // Cambiar a modo rotar
+    });
+  }
+
+  if (scaleButton) {
+    scaleButton.addEventListener('click', function() {
+      transformControls.setMode('scale'); // Cambiar a modo escalar
+    });
+  }
+
+  
+});
+
+let curve, points = [];
+let pointMeshes = [];
+let curveObject;
+let currentPointIndex = 0;
+
+// Mostrar/ocultar el menú al presionar el botón Line
+document.getElementById("line-button").addEventListener("click", () => {
+  const lineMenu = document.getElementById("line-menu");
+  lineMenu.style.display = lineMenu.style.display === "block" ? "none" : "block";
+});
+
+// Crear línea
+document.getElementById("create-line-button").addEventListener("click", () => {
+  const numPoints = parseInt(document.getElementById("line-points").value);
+
+  // Limpiar elementos previos
+  points = [];
+  pointMeshes.forEach(mesh => scene.remove(mesh));
+  pointMeshes = [];
+  if (curveObject) scene.remove(curveObject);
+
+  // Crear puntos
+  for (let i = 0; i < numPoints; i++) {
+    const point = new THREE.Vector3(i * 2, 0, 0);
+    points.push(point);
+
+    const mesh = new THREE.Mesh(
+      new THREE.SphereGeometry(0.1, 16, 16),
+      new THREE.MeshStandardMaterial({ color: 0x000000 })
+    );
+    mesh.position.copy(point);
+    scene.add(mesh);
+    pointMeshes.push(mesh);
+
+    // Asociar función para actualizar la curva al mover un punto
+    mesh.userData.updateCurve = () => {
+      points[pointMeshes.indexOf(mesh)].copy(mesh.position);
+      updateCurve();
+    };
+
+    // Detectar cambios con TransformControls
+    transformControls.attach(mesh);
+    transformControls.addEventListener("objectChange", () => {
+      mesh.userData.updateCurve();
+    });
+  }
+
+  // Dibujar la curva inicial
+  updateCurve();
+});
+
+// Función para actualizar la curva
+function updateCurve() {
+  if (curveObject) scene.remove(curveObject);
+  curve = new THREE.CatmullRomCurve3(points);
+  const curveGeometry = new THREE.BufferGeometry().setFromPoints(curve.getPoints(50));
+  const curveMaterial = new THREE.LineBasicMaterial({ color: 0x0000ff });
+  curveObject = new THREE.Line(curveGeometry, curveMaterial);
+  scene.add(curveObject);
+}
+
+// Navegar entre puntos con < y >
+document.getElementById("prev-point-button").addEventListener("click", () => {
+  if (currentPointIndex > 0) {
+    currentPointIndex--;
+    transformControls.attach(pointMeshes[currentPointIndex]);
+  }
+});
+
+document.getElementById("next-point-button").addEventListener("click", () => {
+  if (currentPointIndex < pointMeshes.length - 1) {
+    currentPointIndex++;
+    transformControls.attach(pointMeshes[currentPointIndex]);
+  }
+});
+// Aplicar forma a la línea
+document.getElementById("apply-shape-button").addEventListener("click", () => {
+  const shape = document.getElementById("line-shape").value;
+
+  // Asegurarse de que la curva se elimine de la escena
+  if (curveObject) {
+    scene.remove(curveObject); // Eliminar la curva de la escena
+    curveObject.geometry.dispose(); // Liberar la geometría
+    curveObject.material.dispose(); // Liberar el material
+    curveObject = null; // Limpiar la referencia
+  }
+
+  // Crear geometría de extrusión
+  const path = curve;
+  let shapeGeometry;
+  if (shape === "cube") {
+    const squareShape = new THREE.Shape();
+    squareShape.moveTo(-0.5, -0.5);
+    squareShape.lineTo(0.5, -0.5);
+    squareShape.lineTo(0.5, 0.5);
+    squareShape.lineTo(-0.5, 0.5);
+    squareShape.lineTo(-0.5, -0.5);
+    shapeGeometry = squareShape;
+  } else if (shape === "cylinder") {
+    const radius = 0.5;
+    shapeGeometry = new THREE.Shape();
+    for (let i = 0; i <= 32; i++) {
+      const angle = (i / 32) * Math.PI * 2;
+      shapeGeometry.lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius);
+    }
+  }
+
+  const extrudeSettings = { steps: 100, bevelEnabled: false, extrudePath: path };
+  const extrudeGeometry = new THREE.ExtrudeGeometry(shapeGeometry, extrudeSettings);
+  const extrudeMaterial = new THREE.MeshStandardMaterial({ color: 0xa3a3a3 });
+  const mesh = new THREE.Mesh(extrudeGeometry, extrudeMaterial);
+
+  // Agregar el objeto a la escena
+  scene.add(mesh);
+  objects.push(mesh);
+
+  // Seleccionar automáticamente el objeto con TransformControls
+  transformControls.attach(mesh);
+});
+
+
+// Crear el cubo >  para la luz como líneas
+function createLightRepresentation(light) {
+  const geometry = new THREE.BoxGeometry(2, 2, 2); // Tamaño del cubo
+  const edges = new THREE.EdgesGeometry(geometry); // Obtener las aristas del cubo
+  const material = new THREE.LineBasicMaterial({ color: 0xffff00 }); // Color amarillo
+  const lightMesh = new THREE.LineSegments(edges, material); // Crear líneas para las aristas
+
+  // Posicionar el cubo representativo donde está la luz
+  lightMesh.position.copy(light.position);
+  lightMesh.castShadow = false; // Desactivar sombras
+  lightMesh.receiveShadow = false; // No recibir sombras
+
+  // Asociar el cubo representativo con la luz
+  light.userData.lightRepresentation = lightMesh;
+  lightMesh.userData.light = light;
+
+  scene.add(lightMesh); // Agregar el cubo de líneas a la escena
+  objects.push(lightMesh); // Hacer interactivo el cubo con raycaster
+
+  return lightMesh;
+}
+// Crear el cubo representativo para la luz
+function createLightRepresentation(light) {
+  const geometry = new THREE.BoxGeometry(2, 2, 2); // Tamaño del cubo
+  const edges = new THREE.EdgesGeometry(geometry); // Obtener las aristas del cubo
+  const material = new THREE.LineBasicMaterial({ color: 0xffff00 }); // Color amarillo
+  const lightMesh = new THREE.LineSegments(edges, material); // Crear líneas para las aristas
+
+  // Posicionar el cubo representativo donde está la luz
+  lightMesh.position.copy(light.position);
+  lightMesh.castShadow = false; // Desactivar sombras
+  lightMesh.receiveShadow = false; // No recibir sombras
+
+  // Asociar el cubo representativo con la luz
+  light.userData.lightRepresentation = lightMesh;
+  lightMesh.userData.light = light;
+
+  scene.add(lightMesh); // Agregar el cubo de líneas a la escena
+  objects.push(lightMesh); // Hacer interactivo el cubo con raycaster
+
+  // Inicialmente la luz visual estará activa (visible)
+  lightMesh.visible = true;
+
+  // Escuchar cambios en el checkbox
+  const luzVisualCheckbox = document.getElementById('luzVisualCheckbox');
+  luzVisualCheckbox.addEventListener('change', () => {
+    lightMesh.visible = luzVisualCheckbox.checked; // Si la casilla está marcada, el cubo será visible
+  });
+
+  return lightMesh;
+}
+
+    // Añadir luces a la escena con representación visual
+    document.querySelectorAll(".add-light").forEach(button => {
+        button.addEventListener("click", () => {
+            const type = button.getAttribute("data-type");
+            let light;
+
+            switch (type) {
+                case "directional":
+                    light = new THREE.DirectionalLight(0xffffff, 1);
+                    light.position.set(0, 10, 0);
+                    light.castShadow = true;
+                    break;
+                case "point":
+                    light = new THREE.PointLight(0xffffff, 1, 100);
+                    light.position.set(0, 10, 0);
+                    light.castShadow = true;
+                    break;
+                case "spot":
+                    light = new THREE.SpotLight(0xffffff, 1);
+                    light.position.set(0, 10, 0);
+                    light.castShadow = true;
+                    light.target.position.set(0, 0, 0);
+                    scene.add(light.target);
+                    break;
+            }
+
+            scene.add(light);
+            currentLight = light;
+            lightSettings.style.display = "block";
+
+            // Crear cubo representativo
+            const lightMesh = createLightRepresentation(light, type);
+
+            // Sincronizar posición y rotación entre la luz y el cubo representativo
+            transformControls.addEventListener("objectChange", () => {
+                if (transformControls.object === lightMesh) {
+                    light.position.copy(lightMesh.position);
+
+                    if (type === "directional" || type === "spot") {
+                        light.target.position.copy(lightMesh.position.clone().add(new THREE.Vector3(0, 0, -1).applyQuaternion(lightMesh.quaternion)));
+                    }
+                }
+            });
+        });
+    });
+
+
+    // Añadir objetos a la escena según el tipo seleccionado
+    const objects = [];
+    document.querySelectorAll(".add-object").forEach(button => {
+      button.addEventListener("click", () => {
+        const type = button.getAttribute("data-type");
+        let geometry;
+
+        switch (type) {
+          case "cube":
+            geometry = new THREE.BoxGeometry(5, 5, 5);
+            break;
+          case "sphere":
+            geometry = new THREE.SphereGeometry(3, 32, 32);
+            break;
+          case "cylinder":
+            geometry = new THREE.CylinderGeometry(3, 3, 7, 32);
+            break;
+          case "plane":
+            geometry = new THREE.PlaneGeometry(10, 10);
+            break;
+          case "cone":
+            geometry = new THREE.ConeGeometry(3, 7, 32);
+            break;
+          case "deformed":
+            const isCube = Math.random() > 0.5;
+            if (isCube) {
+              geometry = new THREE.BoxGeometry(5, 5, 5);
+              geometry.attributes.position.array.forEach((v, i, arr) => {
+                arr[i] += (Math.random() - 0.5) * 2;
+              });
+            } else {
+              geometry = new THREE.SphereGeometry(3, 32, 32);
+              geometry.attributes.position.array.forEach((v, i, arr) => {
+                arr[i] += (Math.random() - 0.5) * 2;
+              });
+            }
+            break;
+        }
+
+        const mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ color: 0xa3a3a3 }));
+        mesh.position.set(0, 0, 0);
+        mesh.castShadow = true;  // Habilitar sombra
+        mesh.receiveShadow = true;  // Permitir que el objeto reciba sombra
+        scene.add(mesh);
+        objects.push(mesh);
+      });
+    });
+
+    // Añadir luces a la escena
+    let currentLight = null;
+    document.querySelectorAll(".add-light").forEach(button => {
+      button.addEventListener("click", () => {
+        const type = button.getAttribute("data-type");
+        let light;
+
+        switch (type) {
+          case "directional":
+            light = new THREE.DirectionalLight(0xffffff, 1);
+            light.position.set(0, 50, 50);
+            light.target.position.set(0, 0, 0);
+            light.castShadow = true;
+            scene.add(light);
+            break;
+          case "point":
+            light = new THREE.PointLight(0xffffff, 1, 100);
+            light.position.set(0, 10, 0);
+            light.castShadow = true;
+            scene.add(light);
+            break;
+          case "spot":
+            light = new THREE.SpotLight(0xffffff, 1);
+            light.position.set(10, 50, 10);
+            light.target.position.set(0, 0, 0);
+            light.castShadow = true;
+            scene.add(light);
+            break;
+        }
+
+        currentLight = light;
+        lightSettings.style.display = "block";
+      });
+    });
+
+    // Actualizar configuraciones de la luz
+    document.getElementById("light-color").addEventListener("input", (e) => {
+      if (currentLight) currentLight.color.set(e.target.value);
+    });
+    document.getElementById("light-intensity").addEventListener("input", (e) => {
+      if (currentLight) currentLight.intensity = e.target.value;
+    });
+    document.getElementById("light-shadow").addEventListener("change", (e) => {
+      if (currentLight) currentLight.castShadow = e.target.checked;
+    });
+    document.getElementById("shadow-softness").addEventListener("input", (e) => {
+      if (currentLight) currentLight.shadow.bias = e.target.value;
+    });
+
+    // Raycaster para tocar objetos
+    function onTouchStart(event) {
+      mouse.x = (event.touches[0].clientX / window.innerWidth) * 2 - 1;
+      mouse.y = - (event.touches[0].clientY / window.innerHeight) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+
+      const intersects = raycaster.intersectObjects(objects);
+      if (intersects.length > 0) {
+        const selectedObject = intersects[0].object;
+        transformControls.attach(selectedObject);
+      }
+    }
+    window.addEventListener("touchstart", onTouchStart, false);
+    const bgTextureButton = document.getElementById("changeBgTextureButton");
+const bgTextureInput = document.getElementById("bgTextureInput");
+
+// Mostrar el selector de archivos al hacer clic en el botón
+bgTextureButton.addEventListener("click", () => {
+  bgTextureInput.click();
+});
+
+// Cambiar la textura del fondo al seleccionar un archivo
+bgTextureInput.addEventListener("change", (event) => {
+  if (event.target.files && event.target.files[0]) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      const textureLoader = new THREE.TextureLoader();
+      const texture = textureLoader.load(e.target.result, () => {
+        scene.background = texture;
+      });
+    };
+
+    reader.readAsDataURL(file);
+  }
+});
+const setBgVideoButton = document.getElementById("setBgVideoButton");
+const bgVideoInput = document.getElementById("bgVideoInput");
+
+// Mostrar el selector de archivos al hacer clic en el botón
+setBgVideoButton.addEventListener("click", () => {
+  bgVideoInput.click();
+});
+
+// Cambiar el fondo a un video al seleccionar un archivo
+bgVideoInput.addEventListener("change", (event) => {
+  if (event.target.files && event.target.files[0]) {
+    const file = event.target.files[0];
+    const video = document.createElement("video");
+
+    video.src = URL.createObjectURL(file);
+    video.loop = true; // Reproducción en bucle
+    video.muted = true; // Sin sonido
+    video.play();
+
+    const videoTexture = new THREE.VideoTexture(video);
+    videoTexture.format = THREE.RGBAFormat;
+
+video.playbackRate = 1.0; // Asegúrate de que la velocidad sea normal
+video.preload = "auto";  // Precargar el video para evitar saltos
+
+    // Establecer la textura del video como fondo
+    scene.background = videoTexture;
+    
+  }
+});
+
+// Obtener los elementos del DOM
+const roughnessButton = document.getElementById("roughnessButton");
+const roughnessInput = document.getElementById("roughnessInput");
+
+// Función para abrir el selector de archivos cuando se presiona el botón
+roughnessButton.addEventListener("click", function() {
+  roughnessInput.click(); // Abrir selector de archivos
+});
+
+// Función para cargar la textura de rugosidad
+roughnessInput.addEventListener("change", function(event) {
+  const file = event.target.files[0]; // Obtener el archivo seleccionado
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const textureLoader = new THREE.TextureLoader();
+      const roughnessTexture = textureLoader.load(e.target.result);
+
+      // Verificar si hay un objeto seleccionado
+      if (transformControls.object) {
+        const material = transformControls.object.material;
+
+        // Asegurarse de que el material sea un material PBR (MeshStandardMaterial o MeshPhysicalMaterial)
+        if (material && (material.isMeshStandardMaterial || material.isMeshPhysicalMaterial)) {
+          // Aplicar la textura de rugosidad
+          material.roughnessMap = roughnessTexture;
+          material.roughness = 1; // Establecer un valor de rugosidad, ajusta según tus necesidades
+
+          // Si también tienes una textura de albedo o baseColor, asegúrate de configurarla también
+          material.needsUpdate = true; // Actualizar el material
+        } else {
+          console.error("El objeto seleccionado no tiene un material adecuado para aplicar rugosidad.");
+        }
+      } else {
+        console.error("No hay objeto seleccionado.");
+      }
+    };
+    reader.readAsDataURL(file); // Leer el archivo como URL
+  }
+});
+
+// Añadir una luz ambiental
+const ambientLight = new THREE.AmbientLight(0xffffff, 1); // Color de la luz (gris suave) e intensidad
+scene.add(ambientLight);
+// Obtener los elementos del DOM
+const adjustLightButton = document.getElementById("adjustLightButton");
+const lightIntensitySlider = document.getElementById("lightIntensitySlider");
+
+// Función para mostrar el control deslizante al presionar el botón
+adjustLightButton.addEventListener("click", function() {
+  // Mostrar u ocultar el control deslizante
+  lightIntensitySlider.style.display = lightIntensitySlider.style.display === "none" ? "block" : "none";
+});
+
+// Función para ajustar la intensidad de las luces
+lightIntensitySlider.addEventListener("input", function() {
+  const intensity = parseFloat(lightIntensitySlider.value);
+
+  // Ajustar la intensidad de la luz ambiental
+  ambientLight.intensity = intensity;
+
+  // Ajustar la intensidad de la luz direccional frontal
+  directionalLight.intensity = intensity;
+
+  // Ajustar la intensidad de la luz direccional opuesta
+  directionalLightOpposite.intensity = intensity;
+});
+const smokeButton = document.getElementById("smokeButton");
+const smokeMenu = document.getElementById("smokeMenu");
+const smokeColorInput = document.getElementById("smokeColor");
+const smokeTransparencyInput = document.getElementById("smokeTransparency");
+const smokeHeightInput = document.getElementById("smokeHeight");
+const smokeDirectionInput = document.getElementById("smokeDirection");
+const smokeAmountInput = document.getElementById("smokeAmount");
+const smokeSpeedInput = document.getElementById("smokeSpeed");
+const confirmSmokeButton = document.getElementById("confirmSmoke");
+
+// Almacena las partículas de humo
+let smokeParticles = [];
+let isGeneratingSmoke = false;
+
+// Mostrar u ocultar el menú de configuración al presionar el botón "Humo"
+smokeButton.addEventListener("click", function () {
+  smokeMenu.style.display = smokeMenu.style.display === "none" ? "block" : "none";
+});
+
+// Función para generar humo
+function generateSmoke(object, config) {
+  const { color, transparency, height, direction, amount, speed } = config;
+
+  for (let i = 0; i < amount; i++) {
+    const smokeGeometry = new THREE.SphereGeometry(Math.random() * 0.5, 16, 16);
+    const smokeMaterial = new THREE.MeshStandardMaterial({
+      color: color,
+      transparent: true,
+      opacity: transparency,
+    });
+
+    const smokeMesh = new THREE.Mesh(smokeGeometry, smokeMaterial);
+
+    // Posicionar el humo alrededor del objeto seleccionado
+    smokeMesh.position.set(
+      object.position.x + Math.cos(direction) * (Math.random() * 2),
+      object.position.y,
+      object.position.z + Math.sin(direction) * (Math.random() * 2)
+    );
+
+    smokeMesh.userData = {
+      speedY: speed + Math.random() * 0.01, // Velocidad de subida
+      life: height * 50, // Duración del humo basado en altura
+    };
+
+    // Agregar el humo a la escena y a la lista de partículas
+    scene.add(smokeMesh);
+    smokeParticles.push(smokeMesh);
+  }
+}
+
+// Confirmar y activar la generación infinita de humo
+confirmSmokeButton.addEventListener("click", function () {
+  if (!transformControls.object) {
+    alert("Selecciona un objeto para añadir humo.");
+    return;
+  }
+
+  const object = transformControls.object;
+
+  const config = {
+    color: smokeColorInput.value,
+    transparency: parseFloat(smokeTransparencyInput.value),
+    height: parseFloat(smokeHeightInput.value),
+    direction: parseFloat(smokeDirectionInput.value) * (Math.PI / 180), // Convertir a radianes
+    amount: parseInt(smokeAmountInput.value),
+    speed: parseFloat(smokeSpeedInput.value),
+  };
+
+  // Iniciar la generación de humo infinita
+  if (!isGeneratingSmoke) {
+    isGeneratingSmoke = true;
+    setInterval(() => {
+      if (isGeneratingSmoke) generateSmoke(object, config);
+    }, 500); // Intervalo de generación (ajustable)
+  }
+
+  // Cerrar el menú
+  smokeMenu.style.display = "none";
+});
+
+// Animar las partículas de humo
+function animateSmoke() {
+  for (let i = smokeParticles.length - 1; i >= 0; i--) {
+    const particle = smokeParticles[i];
+    particle.position.y += particle.userData.speedY; // Subir el humo
+    particle.userData.life--; // Reducir la vida útil del humo
+
+    // Reducir la opacidad gradualmente
+    particle.material.opacity = Math.max(0, particle.material.opacity - 0.005);
+
+    // Eliminar la partícula cuando su vida útil se acaba
+    if (particle.userData.life <= 0 || particle.material.opacity <= 0) {
+      scene.remove(particle);
+      smokeParticles.splice(i, 1);
+    }
+  }
+  requestAnimationFrame(animateSmoke);
+}
+
+// Iniciar la animación del humo
+animateSmoke();
+
+// Crear un botón para configurar el fuego
+const fireButton = document.getElementById("fireButton");
+const fireMenu = document.getElementById("fireMenu");
+const fireConfirmButton = document.getElementById("fireConfirmButton");
+
+const fireColorInput = document.getElementById("fireColor");
+const fireSizeInput = document.getElementById("fireSize");
+const fireSpeedInput = document.getElementById("fireSpeed");
+const fireOpacityInput = document.getElementById("fireOpacity");
+const fireIntensityInput = document.getElementById("fireIntensity");
+const fireQuantityInput = document.getElementById("fireQuantity");
+
+const activeFireGroups = []; // Lista para almacenar los sistemas de fuego activos
+
+fireButton.addEventListener("click", () => {
+  if (!transformControls.object) {
+    alert("Selecciona un objeto para añadir fuego.");
+    return;
+  }
+  fireMenu.style.display = "block";
+});
+
+// Función para crear el sistema de partículas
+function createFireParticles(object, quantity, size, color, opacity, speed, intensity) {
+  const fireGroup = new THREE.Group();
+  object.add(fireGroup);
+
+  // Geometría de partículas
+  const particlesGeometry = new THREE.BufferGeometry();
+  const positions = new Float32Array(quantity * 3);
+  const lifetimes = new Float32Array(quantity);
+
+  for (let i = 0; i < quantity; i++) {
+    positions[i * 3] = (Math.random() - 0.5) * size;
+    positions[i * 3 + 1] = Math.random() * size;
+    positions[i * 3 + 2] = (Math.random() - 0.5) * size;
+    lifetimes[i] = Math.random();
+  }
+
+  particlesGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  particlesGeometry.setAttribute("lifetime", new THREE.BufferAttribute(lifetimes, 1));
+
+  // Material con shaders
+  const fireMaterial = new THREE.ShaderMaterial({
+    uniforms: {
+      uTime: { value: 0 },
+      uColor: { value: new THREE.Color(color) },
+      uOpacity: { value: opacity },
+      uSpeed: { value: speed },
+      uIntensity: { value: intensity },
+    },
+    vertexShader: `
+      attribute float lifetime;
+      uniform float uTime;
+      uniform float uSpeed;
+      varying float vLifetime;
+
+      void main() {
+        vLifetime = mod(lifetime + uTime * uSpeed, 1.0);
+        vec3 newPosition = position;
+        newPosition.y += vLifetime * 2.0; // Movimiento hacia arriba
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
+        gl_PointSize = 10.0 * (1.0 - vLifetime); // Tamaño variable
+      }
+    `,
+    fragmentShader: `
+      uniform vec3 uColor;
+      uniform float uOpacity;
+      varying float vLifetime;
+
+      void main() {
+        float alpha = 1.0 - vLifetime;
+        vec3 color = uColor * alpha;
+        gl_FragColor = vec4(color, alpha * uOpacity);
+      }
+    `,
+    transparent: true,
+    depthWrite: false,
+  });
+
+  const fireParticles = new THREE.Points(particlesGeometry, fireMaterial);
+  fireGroup.add(fireParticles);
+
+  // Guardar referencia del fuego activo
+  activeFireGroups.push({ fireGroup, fireMaterial });
+
+  // Animar el fuego
+  function animateFire() {
+    fireMaterial.uniforms.uTime.value += 0.02;
+    requestAnimationFrame(animateFire);
+  }
+  animateFire();
+}
+
+// Confirmar configuración del fuego
+fireConfirmButton.addEventListener("click", () => {
+  if (!transformControls.object) {
+    alert("Selecciona un objeto para añadir fuego.");
+    return;
+  }
+
+  const object = transformControls.object;
+  const fireColor = fireColorInput.value;
+  const fireSize = parseFloat(fireSizeInput.value);
+  const fireSpeed = parseFloat(fireSpeedInput.value);
+  const fireOpacity = parseFloat(fireOpacityInput.value);
+  const fireIntensity = parseFloat(fireIntensityInput.value);
+  const fireQuantity = parseInt(fireQuantityInput.value);
+
+  createFireParticles(object, fireQuantity, fireSize, fireColor, fireOpacity, fireSpeed, fireIntensity);
+  fireMenu.style.display = "none"; // Ocultar el menú
+});
+
+// Asegúrate de que transformControls solo se declare una ve
+
+// Función para copiar el objeto actualmente manipulado por TransformControls
+function copySelectedObject() {
+  const objectToCopy = transformControls.object;  // Obtenemos el objeto actualmente manipulado
+
+  if (objectToCopy) {
+    const clonedObject = objectToCopy.clone();  // Clonar el objeto
+    clonedObject.position.set(objectToCopy.position.x + 0, objectToCopy.position.y, objectToCopy.position.z);  // Nueva posición
+    scene.add(clonedObject);  // Añadir el objeto clonado a la escena
+    objects.push(clonedObject);  // Almacenar el objeto copiado en el array de objetos
+  } else {
+    alert('No hay un objeto seleccionado para copiar');
+  }
+}
+
+// Evento del botón para copiar el objeto
+document.getElementById('copy-object').addEventListener('click', copySelectedObject);
+
+
+// Función para manejar el cambio del checkbox
+document.getElementById('grid-helper-checkbox').addEventListener('change', function(event) {
+  if (event.target.checked) {
+    // Activar el GridHelper
+    if (!scene.children.includes(gridHelper)) {
+      scene.add(gridHelper);
+    }
+  } else {
+    // Desactivar el GridHelper
+    if (scene.children.includes(gridHelper)) {
+      scene.remove(gridHelper);
+    }
+  }
+});
+
+// Obtener el botón de borrar
+const deleteObjectButton = document.getElementById('delete-object-button');
+
+// Crear la función para borrar el objeto
+deleteObjectButton.addEventListener('click', function() {
+  if (transformControls.object) {
+    // Borrar el objeto de la escena
+    scene.remove(transformControls.object);
+    
+    // Si es necesario, eliminar el objeto de transformControls
+    transformControls.detach();
+    
+    // Actualizar la escena
+    render();
+  }
+});
+
+function toggleSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    sidebar.style.display = sidebar.style.display === "none" ? "block" : "none";
+  }
+
+const volumeButton = document.getElementById("volume-button");
+const volumeControls = document.getElementById("volume-controls");
+const densityInput = document.getElementById("particle-density");
+const sizeInput = document.getElementById("particle-size");
+const colorInput = document.getElementById("volume-color");
+const opacityInput = document.getElementById("volume-opacity");
+const applyVolumeButton = document.getElementById("apply-volume");
+
+let particleSystem;
+let particleMaterial;
+let particleGeometry;
+
+// Shader de partículas
+const vertexShader = `
+  uniform float size;
+  varying vec3 vColor;
+  void main() {
+    vColor = color;
+    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+    gl_PointSize = size * (300.0 / -mvPosition.z);
+    gl_Position = projectionMatrix * mvPosition;
+  }
+`;
+
+const fragmentShader = `
+  uniform float opacity;
+  varying vec3 vColor;
+  void main() {
+    float alpha = 1.0 - length(gl_PointCoord - 0.5);
+    gl_FragColor = vec4(vColor, alpha * opacity);
+  }
+`;
+
+// Crear sistema de partículas
+function createParticleVolume(density, size, color, opacity) {
+  // Si ya existe un sistema de partículas, eliminarlo
+  if (particleSystem) {
+    scene.remove(particleSystem);
+  }
+
+  // Geometría de partículas
+  particleGeometry = new THREE.BufferGeometry();
+  const positions = [];
+  const colors = [];
+  const particleColor = new THREE.Color(color);
+
+  // Generar partículas dentro del cubo
+  for (let i = 0; i < density; i++) {
+    const x = Math.random() * 10 - 5; // Limitar al tamaño del cubo
+    const y = Math.random() * 10 - 5;
+    const z = Math.random() * 10 - 5;
+
+    positions.push(x, y, z);
+    colors.push(particleColor.r, particleColor.g, particleColor.b);
+  }
+
+  particleGeometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  particleGeometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+
+  // Material de partículas con shaders
+  particleMaterial = new THREE.ShaderMaterial({
+    vertexShader,
+    fragmentShader,
+    transparent: true,
+    depthWrite: false,
+    uniforms: {
+      size: { value: size },
+      opacity: { value: opacity },
+    },
+    vertexColors: true,
+  });
+
+  // Sistema de partículas
+  particleSystem = new THREE.Points(particleGeometry, particleMaterial);
+  scene.add(particleSystem);
+
+  // Si ya existe un control, no lo necesitamos crear de nuevo, solo adjuntarlo
+  if (transformControls) {
+    transformControls.attach(particleSystem);
+  }
+}
+
+// Raycasting para detectar clics
+function onObjectClick(event) {
+  // Calcular la intersección con los objetos en la escena usando el raycaster
+  const intersects = getIntersects(event);
+
+  if (intersects.length > 0) {
+    const selectedObject = intersects[0].object;
+
+    // Verificar si el objeto es el sistema de partículas
+    if (selectedObject === particleSystem) {
+      // Adjuntar los controles al sistema de partículas
+      transformControls.attach(selectedObject);
+    }
+  }
+}
+
+// Obtener las intersecciones entre el raycaster y los objetos de la escena
+function getIntersects(event) {
+  const mouse = new THREE.Vector2();
+  const raycaster = new THREE.Raycaster();
+
+  // Normalizar las coordenadas del mouse
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+  // Configurar el rayo a partir de la cámara y la posición del mouse
+  raycaster.setFromCamera(mouse, camera);
+
+  // Devolver las intersecciones con los objetos en la escena
+  return raycaster.intersectObjects(scene.children);
+}
+
+// Event listener para manejar el clic en la escena
+window.addEventListener('click', onObjectClick);
+
+// Botón para mostrar controles y crear sistema de partículas
+volumeButton.addEventListener("click", () => {
+  volumeControls.style.display = "block";
+  if (!particleSystem) {
+    createParticleVolume(1000, 1, "#ffffff", 0.5);
+  }
+});
+
+// Aplicar configuraciones
+applyVolumeButton.addEventListener("click", () => {
+  const density = parseInt(densityInput.value);
+  const size = parseFloat(sizeInput.value);
+  const color = colorInput.value;
+  const opacity = parseFloat(opacityInput.value);
+
+  createParticleVolume(density, size, color, opacity);
+});
+
+
+  window.onload = function() {
+    // Simular clic en el botón "Cube"
+    const cubeButton = document.querySelector('.add-object[data-type="cube"]');
+    if (cubeButton) {
+      cubeButton.click();
+    }
+
+    // Simular clic en el botón "Menu"
+    const menuButton = document.getElementById('menu-button');
+    if (menuButton) {
+      menuButton.click();
+    }
+  };
+
+// Referencias a los botones y menú
+const parentButton = document.getElementById('parentButton');
+const parentMenu = document.getElementById('parentMenu');
+const setParentButton = document.getElementById('setParent');
+const setChildButton = document.getElementById('setChild');
+const confirmParentingButton = document.getElementById('confirmParenting');
+
+// Variables para almacenar el objeto madre e hijo
+let parentObject = null;
+let childObject = null;
+
+// Mostrar/ocultar el menú al presionar el botón "Parent"
+parentButton.addEventListener('click', () => {
+  parentMenu.style.display = parentMenu.style.display === 'none' ? 'block' : 'none';
+});
+
+// Configurar el objeto "madre"
+setParentButton.addEventListener('click', () => {
+  if (transformControls.object) {
+    parentObject = transformControls.object;
+    alert(`Madre seleccionada: ${parentObject.name || 'Sin nombre'}`);
+  } else {
+    alert('Por favor, selecciona un objeto para asignar como madre.');
+  }
+});
+
+// Configurar el objeto "hijo"
+setChildButton.addEventListener('click', () => {
+  if (transformControls.object) {
+    childObject = transformControls.object;
+    alert(`Hijo seleccionado: ${childObject.name || 'Sin nombre'}`);
+  } else {
+    alert('Por favor, selecciona un objeto para asignar como hijo.');
+  }
+});
+
+// Confirmar el emparentado
+confirmParentingButton.addEventListener('click', () => {
+  if (parentObject && childObject) {
+    // Emparentar el objeto hijo al objeto madre
+    parentObject.add(childObject);
+    alert(`El objeto "${childObject.name || 'Sin nombre'}" ahora es hijo de "${parentObject.name || 'Sin nombre'}".`);
+    // Restablecer las variables
+    parentObject = null;
+    childObject = null;
+    // Ocultar el menú
+    parentMenu.style.display = 'none';
+  } else {
+    alert('Por favor, selecciona tanto un objeto madre como un objeto hijo antes de confirmar.');
+  }
+});
+
+// Botón de visibilidad (solo al objeto con TransformControls adjunto)
+document.getElementById("make-visible-button").addEventListener("click", () => {
+  if (transformControls.object) {
+    // Hacer visible siempre el objeto con TransformControls
+    transformControls.object.renderOrder = 1; // Hacerlo visible siempre
+    transformControls.object.material.depthTest = false;
+    transformControls.object.material.depthWrite = false;
+  }
+});
+
+document.getElementById("restore-visibility-button").addEventListener("click", () => {
+  if (transformControls.object) {
+    // Restaurar visibilidad normal
+    transformControls.object.renderOrder = 0;
+    transformControls.object.material.depthTest = true;
+    transformControls.object.material.depthWrite = true;
+  }
+});
+
+let currentOutlinedObject = null; // Objeto al que se aplicará el contorno
+let isOutlineMenuVisible = false; // Estado del menú
+
+// Función para aplicar el contorno al objeto seleccionado
+function applyOutlineEffect(object) {
+  if (!object) return;
+
+
+
+  // Crear un nuevo contorno
+  const outlineMaterial = new THREE.MeshBasicMaterial({
+    color: new THREE.Color(document.getElementById("outline-color").value),
+    side: THREE.BackSide,
+    transparent: true,
+    opacity: parseFloat(document.getElementById("outline-emissive").value),
+  });
+
+  const outlineMesh = new THREE.Mesh(object.geometry.clone(), outlineMaterial);
+  outlineMesh.scale.multiplyScalar(1 + parseFloat(document.getElementById("outline-size").value));
+
+  // Vincular el contorno al objeto
+  object.add(outlineMesh);
+  object.userData.outlineMesh = outlineMesh;
+
+  currentOutlinedObject = object;
+}
+
+// Actualizar las propiedades del contorno en tiempo real
+function updateOutlineProperties() {
+  if (!currentOutlinedObject || !currentOutlinedObject.userData.outlineMesh) return;
+
+  const outlineMesh = currentOutlinedObject.userData.outlineMesh;
+
+  // Actualizar color
+  outlineMesh.material.color.set(document.getElementById("outline-color").value);
+
+  // Actualizar emisividad
+  outlineMesh.material.opacity = parseFloat(document.getElementById("outline-emissive").value);
+
+  // Actualizar tamaño
+  const newScale = 1 + parseFloat(document.getElementById("outline-size").value);
+  outlineMesh.scale.set(newScale, newScale, newScale);
+}
+
+// Mostrar/Ocultar el menú de contorno y aplicar contorno al objeto seleccionado
+document.getElementById("outline-button").addEventListener("click", () => {
+  const menu = document.getElementById("outline-controls");
+
+  if (isOutlineMenuVisible) {
+    // Ocultar el menú
+    menu.style.display = "none";
+    isOutlineMenuVisible = false;
+  } else {
+    // Verificar si hay un objeto seleccionado con TransformControls
+    if (transformControls && transformControls.object) {
+      applyOutlineEffect(transformControls.object);
+
+      // Mostrar el menú
+      menu.style.display = "block";
+      isOutlineMenuVisible = true;
+    } else {
+      alert("Por favor, selecciona un objeto con TransformControls.");
+    }
+  }
+});
+
+// Event listeners para actualizar propiedades en tiempo real
+document.getElementById("outline-color").addEventListener("input", updateOutlineProperties);
+document.getElementById("outline-emissive").addEventListener("input", updateOutlineProperties);
+document.getElementById("outline-size").addEventListener("input", updateOutlineProperties);
+
+// Variables
+const vistaButton = document.getElementById('vistaButton');
+const perspectiveMenu = document.getElementById('perspectiveMenu');
+const perspectiveButtons = perspectiveMenu.getElementsByTagName('button');
+
+// Función para cambiar la perspectiva
+function changePerspective(perspective) {
+  const target = new THREE.Vector3(0, 0, 0); // Centro de la escena
+  const distance = camera.position.length(); // Mantener la distancia actual
+
+  switch (perspective) {
+    case 'X':
+      camera.position.set(distance, 0, 0); // Mantiene la distancia en X
+      break;
+    case 'Y':
+      camera.position.set(0, distance, 0); // Mantiene la distancia en Y
+      break;
+    case 'Z':
+      camera.position.set(0, 0, distance); // Mantiene la distancia en Z
+      break;
+    case '-X':
+      camera.position.set(-distance, 0, 0); // Mantiene la distancia en -X
+      break;
+    case '-Y':
+      camera.position.set(0, -distance, 0); // Mantiene la distancia en -Y
+      break;
+    case '-Z':
+      camera.position.set(0, 0, -distance); // Mantiene la distancia en -Z
+      break;
+    default:
+      camera.position.set(5, 5, 5); // Vista normal
+  }
+
+  camera.lookAt(target); // Hacer que la cámara mire al centro de la escena
+}
+
+// Evento para mostrar/ocultar el menú de perspectivas
+vistaButton.addEventListener('click', () => {
+  perspectiveMenu.style.display = (perspectiveMenu.style.display === 'none' || perspectiveMenu.style.display === '') ? 'block' : 'none';
+});
+
+// Añadir evento a cada botón de perspectiva
+Array.from(perspectiveButtons).forEach(button => {
+  button.addEventListener('click', (event) => {
+    const perspective = event.target.getAttribute('data-perspective');
+    changePerspective(perspective);
+    perspectiveMenu.style.display = 'none';  // Cerrar el menú después de seleccionar
+  });
+});
+
+let currentFrame = 0;
+let isPlaying = false;
+let fps = 24; // FPS inicial
+let totalFrames = 214; // Fotogramas totales iniciales
+const timelines = new Map(); // Mapa para almacenar los timelines por objeto
+let currentObject = null; // Objeto seleccionado actualmente
+const frameLines = document.getElementById('frameLines');
+const keyframeMarkers = document.getElementById('keyframeMarkers');
+const currentFrameMarker = document.getElementById('currentFrameMarker');
+
+// Crear las líneas de fotogramas (|||).
+function createFrameLines() {
+  frameLines.innerHTML = '';
+  for (let i = 0; i <= totalFrames; i++) {
+    const line = document.createElement('div');
+    line.className = 'frame-line';
+    line.style.left = `${i * 10}px`;
+    frameLines.appendChild(line);
+
+    // Clic para mover el frame actual
+    line.addEventListener('click', () => {
+      currentFrame = i;
+      updateCurrentFrameMarker();
+    });
+  }
+}
+
+// Actualizar el marcador de fotograma actual.
+function updateCurrentFrameMarker() {
+  currentFrameMarker.style.left = `${currentFrame * 10}px`;
+  if (currentObject) {
+    interpolateKeyframes(currentObject, currentFrame);
+  }
+}
+
+// Agregar un keyframe para el objeto seleccionado.
+function addKeyframe(object) {
+  if (!timelines.has(object)) {
+    timelines.set(object, []); // Crear un nuevo timeline vacío si no existe
+  }
+
+  const objectTimeline = timelines.get(object);
+
+  // Verificar si ya existe un keyframe para el fotograma actual
+  if (objectTimeline.some(keyframe => keyframe.frame === currentFrame)) return;
+
+  objectTimeline.push({
+    frame: currentFrame,
+    position: object.position.clone(),
+    rotation: object.rotation.clone(),
+    scale: object.scale.clone(),
+  });
+
+  objectTimeline.sort((a, b) => a.frame - b.frame); // Ordenar los keyframes por el número de fotograma
+
+  addKeyframeMarker(currentFrame);
+}
+
+// Agregar un marcador visual de keyframe.
+function addKeyframeMarker(frame) {
+  const marker = document.createElement('div');
+  marker.className = 'keyframe-marker';
+  marker.style.left = `${frame * 10}px`;
+  keyframeMarkers.appendChild(marker);
+}
+
+// Interpolación de los keyframes para la animación.
+function interpolateKeyframes(object, time) {
+  const objectTimeline = timelines.get(object);
+  if (!objectTimeline || objectTimeline.length < 2) return;
+
+  let startKeyframe = null;
+  let endKeyframe = null;
+
+  for (let i = 0; i < objectTimeline.length - 1; i++) {
+    if (time >= objectTimeline[i].frame && time <= objectTimeline[i + 1].frame) {
+      startKeyframe = objectTimeline[i];
+      endKeyframe = objectTimeline[i + 1];
+      break;
+    }
+  }
+
+  if (!startKeyframe || !endKeyframe) return;
+
+  const t = (time - startKeyframe.frame) / (endKeyframe.frame - startKeyframe.frame);
+
+  object.position.lerpVectors(startKeyframe.position, endKeyframe.position, t);
+  object.rotation.set(
+    THREE.MathUtils.lerp(startKeyframe.rotation.x, endKeyframe.rotation.x, t),
+    THREE.MathUtils.lerp(startKeyframe.rotation.y, endKeyframe.rotation.y, t),
+    THREE.MathUtils.lerp(startKeyframe.rotation.z, endKeyframe.rotation.z, t)
+  );
+  object.scale.lerpVectors(startKeyframe.scale, endKeyframe.scale, t);
+}
+
+// Iniciar la animación con el FPS ajustado.
+function playAnimation(objects) {
+  if (isPlaying) return;
+  isPlaying = true;
+
+  const frameDuration = 1000 / fps; // Calcular la duración de cada fotograma en milisegundos.
+
+  function animate() {
+    if (!isPlaying) return;
+
+    currentFrame++;
+    if (currentFrame > totalFrames) {
+      isPlaying = false;
+      return;
+    }
+
+    updateCurrentFrameMarker();
+    objects.forEach((object) => interpolateKeyframes(object, currentFrame));
+
+    setTimeout(animate, frameDuration); // Espera basada en el FPS
+  }
+
+  animate();
+}
+
+// Botones para controlar la animación.
+document.getElementById('btnPlay').addEventListener('click', () => playAnimation([...timelines.keys()]));
+document.getElementById('btnPause').addEventListener('click', () => { isPlaying = false; });
+document.getElementById('btnAddKeyframe').addEventListener('click', () => {
+  if (transformControls.object) {
+    addKeyframe(transformControls.object);
+  } else {
+    alert('Selecciona un objeto primero.');
+  }
+});
+
+// Navegación de frames.
+document.getElementById('btnFirstFrame').addEventListener('click', () => { currentFrame = 0; updateCurrentFrameMarker(); });
+document.getElementById('btnLastFrame').addEventListener('click', () => { currentFrame = totalFrames; updateCurrentFrameMarker(); });
+document.getElementById('btnPreviousFrame').addEventListener('click', () => { currentFrame = Math.max(0, currentFrame - 1); updateCurrentFrameMarker(); });
+document.getElementById('btnNextFrame').addEventListener('click', () => { currentFrame = Math.min(totalFrames, currentFrame + 1); updateCurrentFrameMarker(); });
+
+// Función para seleccionar un objeto.
+function selectObject(object) {
+  currentObject = object;
+
+  if (!timelines.has(object)) {
+    timelines.set(object, []); // Inicializar timeline vacío si no tiene
+  }
+
+  keyframeMarkers.innerHTML = '';
+  loadTimelineForObject(object);
+}
+
+// Cargar el timeline del objeto seleccionado.
+function loadTimelineForObject(object) {
+  const objectTimeline = timelines.get(object);
+
+  objectTimeline.forEach((keyframe) => {
+    addKeyframeMarker(keyframe.frame);
+  });
+}
+
+// Cambiar FPS
+document.getElementById('fpsInput').addEventListener('input', (event) => {
+  const newFps = parseInt(event.target.value);
+  if (!isNaN(newFps) && newFps > 0) {
+    fps = newFps;
+    document.getElementById('fpsLabel').innerText = `FPS: ${fps}`;
+  }
+});
+
+// Cambiar total de fotogramas
+document.getElementById('totalFramesInput').addEventListener('input', (event) => {
+  const newTotalFrames = parseInt(event.target.value);
+  if (!isNaN(newTotalFrames) && newTotalFrames > 0) {
+    totalFrames = newTotalFrames;
+    document.getElementById('totalFramesLabel').innerText = `Total de fotogramas: ${totalFrames}`;
+    createFrameLines(); // Actualizar las líneas de fotogramas
+  }
+});
+
+// Crear las líneas de fotogramas
+createFrameLines();
+
+// Botones para controlar la animación.
+document.getElementById('btnPlay').addEventListener('click', () => playAnimation([...timelines.keys()]));
+document.getElementById('btnPause').addEventListener('click', () => { isPlaying = false; });
+document.getElementById('btnAddKeyframe').addEventListener('click', () => {
+  if (transformControls.object) {
+    addKeyframe(transformControls.object);
+  } else {
+    alert('Selecciona un objeto primero.');
+  }
+});
+
+// Navegación de frames.
+document.getElementById('btnFirstFrame').addEventListener('click', () => { currentFrame = 0; updateCurrentFrameMarker(); });
+document.getElementById('btnLastFrame').addEventListener('click', () => { currentFrame = totalFrames; updateCurrentFrameMarker(); });
+document.getElementById('btnPreviousFrame').addEventListener('click', () => { currentFrame = Math.max(0, currentFrame - 1); updateCurrentFrameMarker(); });
+document.getElementById('btnNextFrame').addEventListener('click', () => { currentFrame = Math.min(totalFrames, currentFrame + 1); updateCurrentFrameMarker(); });
+
+// Función para seleccionar un objeto.
+function selectObject(object) {
+  currentObject = object;
+
+  if (!timelines.has(object)) {
+    timelines.set(object, []); // Inicializar timeline vacío si no tiene
+  }
+
+  keyframeMarkers.innerHTML = '';
+  loadTimelineForObject(object);
+}
+
+// Cargar el timeline del objeto seleccionado.
+function loadTimelineForObject(object) {
+  const objectTimeline = timelines.get(object);
+
+  objectTimeline.forEach((keyframe) => {
+    addKeyframeMarker(keyframe.frame);
+  });
+}
+
+// Cambiar FPS
+document.getElementById('fpsInput').addEventListener('input', (event) => {
+  const newFps = parseInt(event.target.value);
+  if (!isNaN(newFps) && newFps > 0) {
+    fps = newFps;
+    document.getElementById('fpsLabel').innerText = `FPS: ${fps}`;
+  }
+});
+
+// Cambiar total de fotogramas
+document.getElementById('totalFramesInput').addEventListener('input', (event) => {
+  const newTotalFrames = parseInt(event.target.value);
+  if (!isNaN(newTotalFrames) && newTotalFrames > 0) {
+    totalFrames = newTotalFrames;
+    document.getElementById('totalFramesLabel').innerText = `Total de fotogramas: ${totalFrames}`;
+    createFrameLines(); // Actualizar las líneas de fotogramas
+  }
+});
+
+// Crear las líneas de fotogramas
+createFrameLines();
+
+// Obtener referencia a la casilla de verificación
+const transformControlCheckbox = document.getElementById("transformControlCheckbox");
+
+// Escuchar cambios en la casilla de verificación
+transformControlCheckbox.addEventListener("change", (event) => {
+  if (event.target.checked) {
+    // Mostrar TransformControls
+    scene.add(transformControls);
+  } else {
+    // Ocultar TransformControls
+    scene.remove(transformControls);
+  }
+});
+
+// Sincronizar estado inicial
+if (transformControlCheckbox.checked) {
+  scene.add(transformControls);
+} else {
+  scene.remove(transformControls);
+}
+
+let mediaRecorder;
+let recordedChunks = [];
+
+// Elementos del DOM
+const renderButton = document.getElementById('renderVideoButton');
+const statusMessage = document.getElementById('statusMessage');
+const recordedVideo = document.getElementById('recordedVideo');
+const videoModal = document.getElementById('videoModal');
+const downloadLink = document.getElementById('downloadLink');
+const copyLinkButton = document.getElementById('copyLinkButton');
+
+// Comenzar o detener la grabación
+renderButton.addEventListener('click', () => {
+  if (renderButton.textContent === "Render Video") {
+    startRecording();
+  } else {
+    stopRecording();
+  }
+});
+
+// Iniciar grabación
+function startRecording() {
+  const canvas = document.querySelector('canvas'); // Asegúrate de que el video se renderiza en un canvas
+  if (!canvas) {
+    statusMessage.textContent = "No se encontró un canvas para grabar.";
+    return;
+  }
+
+  const videoStream = canvas.captureStream(30); // 30 FPS
+
+  mediaRecorder = new MediaRecorder(videoStream, { mimeType: 'video/webm' });
+  recordedChunks = [];
+
+  mediaRecorder.ondataavailable = (event) => {
+    if (event.data.size > 0) {
+      recordedChunks.push(event.data);
+    }
+  };
+
+  mediaRecorder.start();
+  console.log('Grabación iniciada.');
+
+  // Cambiar el botón a "Terminar" y mostrar mensaje
+  renderButton.textContent = "Terminar";
+  statusMessage.textContent = "Grabando...";
+
+  // Detener grabación y mostrar video
+  mediaRecorder.onstop = () => {
+    statusMessage.textContent = "Generando video...";
+    const blob = new Blob(recordedChunks, { type: 'video/webm' });
+    const videoURL = URL.createObjectURL(blob);
+    recordedVideo.src = videoURL;
+
+    // Subir el video a File.io y obtener un enlace accesible
+    uploadVideoToFileIO(blob);
+  };
+}
+
+// Detener grabación
+function stopRecording() {
+  mediaRecorder.stop();
+  console.log('Grabación detenida.');
+
+  // Cambiar el botón a "Render Video"
+  renderButton.textContent = "Render Video";
+
+  // Deshabilitar el botón temporalmente
+  renderButton.disabled = true;
+}
+
+// Subir video a File.io y obtener el enlace
+async function uploadVideoToFileIO(blob) {
+  const formData = new FormData();
+  formData.append('file', blob, 'video_rendered.webm');
+
+  try {
+    const response = await fetch('https://file.io/', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error('Error en la respuesta del servidor');
+    }
+
+    const result = await response.json();
+
+    if (result.success) {
+      const videoURL = result.link;
+      // Mostrar el video y el enlace de descarga
+      videoModal.style.display = "block";
+      downloadLink.href = videoURL;
+      downloadLink.textContent = "Descargar Video";
+      downloadLink.style.display = "inline-block";
+
+      // Hacer que el enlace sea clickeable y se pueda compartir
+      copyLinkButton.style.display = "inline-block";
+      downloadLink.style.color = "#007BFF"; // Asegura que el enlace se vea como clickeable
+
+      // Copiar el enlace al portapapeles cuando el usuario hace clic en "Copiar Enlace"
+      copyLinkButton.addEventListener('click', () => {
+        navigator.clipboard.writeText(videoURL).then(() => {
+          statusMessage.textContent = 'Enlace copiado al portapapeles. ¡Comparte en WhatsApp!';
+        }).catch((err) => {
+          statusMessage.textContent = 'Error al copiar el enlace: ' + err;
+        });
+      });
+    }
+  } catch (error) {
+    statusMessage.textContent = `Error: ${error.message}`;
+  }
+}
+
+// Elementos del DOM
+const blockButton = document.getElementById('blockButton');
+const lockIcon = document.getElementById('lockIcon');
+
+// Variable para manejar el estado de bloqueo
+let isLocked = false; // Indica si el TransformControls está bloqueado
+
+// Evento para bloquear/desbloquear TransformControls
+blockButton.addEventListener('click', function () {
+  isLocked = !isLocked; // Alternar entre bloqueado y desbloqueado
+
+  if (isLocked) {
+    // Cambiar icono a candado cerrado
+    lockIcon.src = 'closed-lock-icon.png';
+
+    // Bloquear el objeto actual
+    if (transformControls.object) {
+      currentObject = transformControls.object; // Usar la variable existente
+      console.log(`Objeto bloqueado: ${currentObject.name}`);
+    } else {
+      console.warn('No hay objeto seleccionado para bloquear.');
+    }
+  } else {
+    // Cambiar icono a candado abierto
+    lockIcon.src = 'open-lock-icon.png';
+
+    // Desbloquear
+    currentObject = null; // Liberar el objeto bloqueado
+    console.log('TransformControls desbloqueado.');
+  }
+});
+
+// Interceptar la selección de objetos
+transformControls.addEventListener('change', function () {
+  if (isLocked && transformControls.object !== currentObject) {
+    // Evitar cambiar el objeto seleccionado
+    transformControls.attach(currentObject);
+    console.warn('El TransformControls está bloqueado a un objeto.');
+  }
+});
+
+// Lógica de selección de objetos
+function selectObject(object) {
+  if (!isLocked) {
+    transformControls.attach(object);
+  } else {
+    console.warn('TransformControls bloqueado. No se puede cambiar el objeto.');
+  }
+}
+// Agregar un evento al botón Render Video
+  document.getElementById("renderVideoButton").addEventListener("click", () => {
+    // Simular el clic en el botón btnPlay
+    document.getElementById("btnPlay").click();
+  });
+  
+  // Obtener referencias a los botones
+const fileButton = document.getElementById('fileButton');
+const fileMenu = document.getElementById('fileMenu');
+const newButton = document.getElementById('newButton');
+const newMenu = document.getElementById('newMenu');
+const button2D = document.getElementById('button2D');
+const button3D = document.getElementById('button3D');
+
+// Mostrar/ocultar el menú "File"
+fileButton.addEventListener('click', () => {
+  fileMenu.style.display = fileMenu.style.display === 'none' ? 'block' : 'none';
+});
+
+// Mostrar/ocultar el menú "New"
+newButton.addEventListener('click', () => {
+  newMenu.style.display = newMenu.style.display === 'none' ? 'block' : 'none';
+});
+
+// Redirigir a 2D.html
+button2D.addEventListener('click', () => {
+  window.location.href = '2d.html';
+});
+
+// Redirigir a 3D.html
+button3D.addEventListener('click', () => {
+  window.location.href = '3d.html';
+});
+
+let rainParticles = null;
+let rainMaterial = null;
+
+// Mostrar/ocultar el menú de lluvia
+document.getElementById("rainButton").addEventListener("click", () => {
+    const rainMenu = document.getElementById("rainMenu");
+    rainMenu.style.display = rainMenu.style.display === "none" ? "block" : "none";
+});
+
+// Función para crear la lluvia
+function createRain(config) {
+    const { color, transparency, quantity, extent, direction, speed } = config;
+
+    // Eliminar lluvia existente si la hay
+    if (rainParticles) {
+        scene.remove(rainParticles);
+        rainParticles.geometry.dispose();
+        rainMaterial.dispose();
+    }
+
+    // Crear geometría y material para las partículas de lluvia
+    const rainGeometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(quantity * 3);
+
+    for (let i = 0; i < quantity; i++) {
+        positions[i * 3] = (Math.random() - 0.5) * extent; // Extensión en X
+        positions[i * 3 + 1] = Math.random() * extent; // Altura inicial en Y
+        positions[i * 3 + 2] = (Math.random() - 0.5) * extent; // Extensión en Z
+    }
+
+    rainGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+
+    rainMaterial = new THREE.PointsMaterial({
+        color: new THREE.Color(color),
+        transparent: true,
+        opacity: transparency,
+        size: 0.5, // Tamaño de las partículas
+    });
+
+    rainParticles = new THREE.Points(rainGeometry, rainMaterial);
+    scene.add(rainParticles);
+
+    // Animar la lluvia
+    function animateRain() {
+        const positions = rainGeometry.attributes.position.array;
+        const radianDirection = THREE.MathUtils.degToRad(direction);
+
+        for (let i = 0; i < positions.length; i += 3) {
+            positions[i] += Math.sin(radianDirection) * speed * 0.1; // Movimiento en X
+            positions[i + 1] -= speed * 0.2; // Caída en Y
+            positions[i + 2] += Math.cos(radianDirection) * speed * 0.1; // Movimiento en Z
+
+            // Reiniciar gotas que salen fuera de los límites
+            if (positions[i + 1] < 0) {
+                positions[i + 1] = Math.random() * extent; // Restablecer en Y
+                positions[i] = (Math.random() - 0.5) * extent; // Restablecer en X
+                positions[i + 2] = (Math.random() - 0.5) * extent; // Restablecer en Z
+            }
+        }
+
+        rainGeometry.attributes.position.needsUpdate = true;
+        requestAnimationFrame(animateRain);
+    }
+    animateRain();
+}
+
+// Manejar el botón de aplicar lluvia
+document.getElementById("applyRainButton").addEventListener("click", () => {
+    const config = {
+        color: document.getElementById("rainColor").value,
+        transparency: parseFloat(document.getElementById("rainTransparency").value),
+        quantity: parseInt(document.getElementById("rainQuantity").value),
+        extent: parseInt(document.getElementById("rainExtent").value),
+        direction: parseFloat(document.getElementById("rainDirection").value),
+        speed: parseFloat(document.getElementById("rainSpeed").value),
+    };
+
+    createRain(config);
+    document.getElementById("rainMenu").style.display = "none"; // Cerrar el menú
+});
+let snowParticles = null;
+let snowMaterial = null;
+
+// Mostrar/ocultar el menú de nieve
+document.getElementById("snowButton").addEventListener("click", () => {
+    const snowMenu = document.getElementById("snowMenu");
+    snowMenu.style.display = snowMenu.style.display === "none" ? "block" : "none";
+});
+
+// Función para crear la nieve
+function createSnow(config) {
+    const { color, transparency, quantity, extent, direction, speed } = config;
+
+    // Eliminar nieve existente si la hay
+    if (snowParticles) {
+        scene.remove(snowParticles);
+        snowParticles.geometry.dispose();
+        snowMaterial.dispose();
+    }
+
+    // Crear geometría y material para las partículas de nieve
+    const snowGeometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(quantity * 3);
+
+    for (let i = 0; i < quantity; i++) {
+        positions[i * 3] = (Math.random() - 0.5) * extent; // Extensión en X
+        positions[i * 3 + 1] = Math.random() * extent; // Altura inicial en Y
+        positions[i * 3 + 2] = (Math.random() - 0.5) * extent; // Extensión en Z
+    }
+
+    snowGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+
+    snowMaterial = new THREE.PointsMaterial({
+        color: new THREE.Color(color),
+        transparent: true,
+        opacity: transparency,
+        size: 1.0, // Tamaño de las partículas (más grande que la lluvia)
+    });
+
+    snowParticles = new THREE.Points(snowGeometry, snowMaterial);
+    scene.add(snowParticles);
+
+    // Animar la nieve
+    function animateSnow() {
+        const positions = snowGeometry.attributes.position.array;
+        const radianDirection = THREE.MathUtils.degToRad(direction);
+
+        for (let i = 0; i < positions.length; i += 3) {
+            positions[i] += Math.sin(radianDirection) * speed * 0.05; // Movimiento en X (lento)
+            positions[i + 1] -= speed * 0.1; // Caída en Y (más lenta que la lluvia)
+            positions[i + 2] += Math.cos(radianDirection) * speed * 0.05; // Movimiento en Z (lento)
+
+            // Reiniciar copos que salen fuera de los límites
+            if (positions[i + 1] < 0) {
+                positions[i + 1] = Math.random() * extent; // Restablecer en Y
+                positions[i] = (Math.random() - 0.5) * extent; // Restablecer en X
+                positions[i + 2] = (Math.random() - 0.5) * extent; // Restablecer en Z
+            }
+        }
+
+        snowGeometry.attributes.position.needsUpdate = true;
+        requestAnimationFrame(animateSnow);
+    }
+    animateSnow();
+}
+
+// Manejar el botón de aplicar nieve
+document.getElementById("applySnowButton").addEventListener("click", () => {
+    const config = {
+        color: document.getElementById("snowColor").value,
+        transparency: parseFloat(document.getElementById("snowTransparency").value),
+        quantity: parseInt(document.getElementById("snowQuantity").value),
+        extent: parseInt(document.getElementById("snowExtent").value),
+        direction: parseFloat(document.getElementById("snowDirection").value),
+        speed: parseFloat(document.getElementById("snowSpeed").value),
+    };
+
+    createSnow(config);
+    document.getElementById("snowMenu").style.display = "none"; // Cerrar el menú
+});
+let oceanParticles = null;
+let oceanMaterial = null;
+
+// Mostrar/ocultar el menú de océano
+document.getElementById("oceanButton").addEventListener("click", () => {
+    const oceanMenu = document.getElementById("oceanMenu");
+    oceanMenu.style.display = oceanMenu.style.display === "none" ? "block" : "none";
+});
+
+// Función para crear el océano
+function createOcean(config) {
+    const { color, transparency, texture, speed, strength, particlesCount, particlesSize } = config;
+
+    // Eliminar partículas existentes si las hay
+    if (oceanParticles) {
+        scene.remove(oceanParticles);
+        oceanParticles.geometry.dispose();
+        oceanMaterial.dispose();
+    }
+
+    // Crear geometría para las partículas
+    const oceanGeometry = new THREE.BufferGeometry();
+    const count = particlesCount; // Usar el valor de cantidad de partículas
+    const positions = new Float32Array(count * 3);
+    const waveOffsets = new Float32Array(count);
+
+    for (let i = 0; i < count; i++) {
+        positions[i * 3] = (Math.random() - 0.5) * 200; // Extensión en X
+        positions[i * 3 + 1] = Math.random() * 10; // Altura inicial en Y
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 200; // Extensión en Z
+        waveOffsets[i] = Math.random() * Math.PI * 2; // Fase inicial
+    }
+
+    oceanGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    oceanGeometry.setAttribute("waveOffset", new THREE.BufferAttribute(waveOffsets, 1));
+
+    // Cargar textura si se proporcionó
+    const textureLoader = new THREE.TextureLoader();
+    let textureMap = null;
+    if (texture) {
+        textureMap = textureLoader.load(texture);
+    }
+
+    // Crear material para las partículas
+    oceanMaterial = new THREE.PointsMaterial({
+        color: new THREE.Color(color),
+        transparent: true,
+        opacity: transparency,
+        size: particlesSize, // Usar el valor de tamaño de partículas
+        map: textureMap,
+        depthWrite: false, // Desactivar escritura de profundidad para transparencias
+    });
+
+    oceanParticles = new THREE.Points(oceanGeometry, oceanMaterial);
+    scene.add(oceanParticles);
+
+    // Animar el océano
+    function animateOcean() {
+        const positions = oceanGeometry.attributes.position.array;
+        const waveOffsets = oceanGeometry.attributes.waveOffset.array;
+
+        for (let i = 0; i < count; i++) {
+            const index = i * 3;
+            positions[index + 1] = // Actualizar altura en Y
+                Math.sin(waveOffsets[i] + performance.now() * 0.001 * speed) * strength;
+        }
+
+        oceanGeometry.attributes.position.needsUpdate = true;
+        requestAnimationFrame(animateOcean);
+    }
+    animateOcean();
+}
+
+// Manejar el botón de aplicar océano
+document.getElementById("applyOceanButton").addEventListener("click", () => {
+    const config = {
+        color: document.getElementById("oceanColor").value,
+        transparency: parseFloat(document.getElementById("oceanTransparency").value),
+        texture: document.getElementById("oceanTexture").files[0]
+            ? URL.createObjectURL(document.getElementById("oceanTexture").files[0])
+            : null,
+        speed: parseFloat(document.getElementById("oceanSpeed").value),
+        strength: parseFloat(document.getElementById("oceanStrength").value),
+        particlesCount: parseInt(document.getElementById("oceanParticlesCount").value), // Obtener cantidad de partículas como número
+        particlesSize: parseFloat(document.getElementById("oceanParticlesSize").value), // Obtener tamaño de partículas
+    };
+
+    createOcean(config);
+    document.getElementById("oceanMenu").style.display = "none"; // Cerrar el menú
+});
+
+
+  let selectedObject = null; // Objeto seleccionado
+  let selectedFaceIndex = null; // Índice de la cara seleccionada
+
+  // Función para activar el modo de edición de caras
+  document.getElementById("cube-faces-button").addEventListener("click", () => {
+    if (!selectedObject || !selectedObject.geometry || !selectedObject.geometry.attributes) {
+      alert("Selecciona un cubo con TransformControls primero.");
+      return;
+    }
+
+    // Asignar colores temporales a cada cara del cubo
+    assignTemporaryFaceColors(selectedObject);
+
+    // Mostrar menú para editar texturas
+    updateCubeFacesMenu();
+    document.getElementById("cube-faces-menu").style.display = "block";
+  });
+
+  // Asignar colores temporales a cada cara del cubo
+  function assignTemporaryFaceColors(cube) {
+    const materials = [];
+    const faceColors = [
+      0xff0000, // Rojo
+      0x00ff00, // Verde
+      0x0000ff, // Azul
+      0xffff00, // Amarillo
+      0xff00ff, // Magenta
+      0x00ffff  // Cian
+    ];
+
+    for (let i = 0; i < 6; i++) {
+      materials.push(new THREE.MeshStandardMaterial({ color: faceColors[i] }));
+    }
+
+    cube.material = materials;
+  }
+
+  // Actualizar el menú de caras
+  function updateCubeFacesMenu() {
+    const faceTexturesDiv = document.getElementById("face-textures");
+    faceTexturesDiv.innerHTML = ""; // Limpiar contenido previo
+
+    if (!selectedObject) return;
+
+    const materials = selectedObject.material;
+
+    materials.forEach((material, index) => {
+      const button = document.createElement("button");
+      button.textContent = `Cara ${index + 1}`;
+      button.style.backgroundColor = material.color.getStyle();
+      button.dataset.index = index;
+
+      // Manejar clic en cada botón de cara
+      button.addEventListener("click", () => {
+        selectedFaceIndex = index;
+        document.getElementById("upload-texture").click();
+      });
+
+      faceTexturesDiv.appendChild(button);
+    });
+  }
+
+  // Aplicar textura a una cara
+  document.getElementById("upload-texture").addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const texture = new THREE.TextureLoader().load(e.target.result);
+      const material = selectedObject.material[selectedFaceIndex];
+      material.map = texture;
+      material.color.set(0xffffff); // Resetear color al blanco para mostrar textura
+      material.needsUpdate = true;
+      updateCubeFacesMenu();
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Configurar TransformControls para trabajar con el cubo seleccionado
+  transformControls.addEventListener("objectChange", () => {
+    selectedObject = transformControls.object;
+  });
+  scene.add(transformControls);
+
+// Lista de objetos de la escena
+// Llena esta lista con tus objetos de Three.js
+// Objeto o grupo actualmente seleccionado
+
+// Crear TransformControls
+
+
+// Deshabilitar OrbitControls cuando se mueve un objeto
+transformControls.addEventListener("mouseDown", () => controls.enabled = false);
+transformControls.addEventListener("mouseUp", () => controls.enabled = true);
+
+// Mostrar/ocultar el panel de objetos
+document.getElementById("sceneButton").addEventListener("click", () => {
+  const scenePanel = document.getElementById("scenePanel");
+  scenePanel.style.display = scenePanel.style.display === "none" ? "block" : "none";
+  updateSceneObjectList();
+});
+
+// Actualizar la lista de objetos en el panel
+function updateSceneObjectList() {
+  const sceneObjectList = document.getElementById("sceneObjectList");
+  sceneObjectList.innerHTML = ""; // Limpiar la lista actual
+
+  objects.forEach((object, index) => {
+    const listItem = document.createElement("li");
+    listItem.textContent = object.name || `Object ${index + 1}`;
+
+    // Selección de objetos
+    listItem.addEventListener("click", () => selectObject(object));
+
+    // Botón para menú de objeto
+    const menuButton = document.createElement("button");
+    menuButton.textContent = "...";
+    menuButton.style.marginLeft = "10px";
+    menuButton.addEventListener("click", (event) => {
+      event.stopPropagation(); // Evitar que se seleccione el objeto
+      openObjectMenu(object);
+    });
+
+    listItem.appendChild(menuButton);
+    sceneObjectList.appendChild(listItem);
+  });
+}
+
+// Seleccionar un objeto o grupo
+function selectObject(object) {
+  selectedObject = object;
+  transformControls.detach(); // Desvincular controles actuales
+  transformControls.attach(object); // Adjuntar controles al objeto o grupo
+}
+
+// Abrir el menú del objeto
+function openObjectMenu(object) {
+  selectedObject = object;
+  const objectMenu = document.getElementById("objectMenu");
+  objectMenu.style.display = "block";
+  document.getElementById("renameInput").value = object.name || "";
+}
+
+// Renombrar un objeto
+document.getElementById("renameInput").addEventListener("input", (event) => {
+  if (selectedObject) {
+    selectedObject.name = event.target.value;
+    updateSceneObjectList();
+  }
+});
+
+// Agrupar objetos
+const groupObjects = [];
+document.getElementById("addToGroupButton").addEventListener("click", () => {
+  if (selectedObject && !groupObjects.includes(selectedObject)) {
+    groupObjects.push(selectedObject);
+    alert(`${selectedObject.name || "Unnamed Object"} added to group.`);
+    document.getElementById("confirmGroupButton").style.display = "inline";
+  }
+});
+
+// Confirmar grupo
+document.getElementById("confirmGroupButton").addEventListener("click", () => {
+  if (groupObjects.length > 1) {
+    const group = new THREE.Group();
+    groupObjects.forEach((obj) => {
+      group.add(obj);
+      objects.splice(objects.indexOf(obj), 1); // Remover objetos individuales
+    });
+
+    group.name = `Group ${Math.random().toFixed(2)}`;
+    objects.push(group);
+    scene.add(group);
+
+    alert("Group created.");
+    groupObjects.length = 0;
+    document.getElementById("confirmGroupButton").style.display = "none";
+    updateSceneObjectList();
+  } else {
+    alert("You need at least 2 objects to create a group.");
+  }
+});
+
+// Cerrar el menú
+document.getElementById("closeMenuButton").addEventListener("click", () => {
+  document.getElementById("objectMenu").style.display = "none";
+});
+
+const button = document.getElementById('toggleAnimation');
+  const timeline = document.getElementById('timeline');
+
+  button.addEventListener('click', () => {
+    if (timeline.style.display === 'none') {
+      timeline.style.display = 'block';
+    } else {
+      timeline.style.display = 'none';
+    }
+  });
+
+const topPanelButton = document.getElementById('toggleTopPanel');
+  const topPanel = document.getElementById('top-panel');
+
+  topPanelButton.addEventListener('click', () => {
+    if (topPanel.style.display === 'none') {
+      topPanel.style.display = 'flex'; // Mostrar el panel con estilo flex
+    } else {
+      topPanel.style.display = 'none'; // Ocultar el panel
+    }
+  });
+  const importVideoButton = document.getElementById("importVideoButton");
+const videoFileInput = document.getElementById("videoFileInput");
+
+let videoElement;
+let videoTexture;
+let videoPlane;
+
+// Abrir el selector de archivos al presionar el botón
+importVideoButton.addEventListener("click", () => {
+  videoFileInput.click();
+});
+
+// Crear el plano y cargar el video
+videoFileInput.addEventListener("change", (event) => {
+  if (event.target.files && event.target.files[0]) {
+    const file = event.target.files[0];
+    videoElement = document.createElement("video");
+
+    videoElement.src = URL.createObjectURL(file);
+    videoElement.loop = true; // Reproducir en bucle
+    videoElement.muted = true; // Sin sonido inicialmente
+    videoElement.play();
+
+    videoTexture = new THREE.VideoTexture(videoElement);
+
+    if (videoPlane) {
+      // Eliminar plano previo si ya existe
+      scene.remove(videoPlane);
+    }
+
+    const planeGeometry = new THREE.PlaneGeometry(16, 9); // Relación de aspecto 16:9
+    const planeMaterial = new THREE.MeshStandardMaterial({
+      map: videoTexture,
+      side: THREE.DoubleSide,
+    });
+
+    videoPlane = new THREE.Mesh(planeGeometry, planeMaterial);
+    videoPlane.position.set(0, 5, 0); // Posición inicial del plano
+    scene.add(videoPlane);
+
+    objects.push(videoPlane); // Hacer interactivo el plano
+
+    alert("Video importado correctamente.");
+  }
+});
+
+// Seleccionar el plano al hacer clic y adjuntar TransformControls
+renderer.domElement.addEventListener("click", (event) => {
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+
+  const intersects = raycaster.intersectObjects(objects);
+  if (intersects.length > 0) {
+    const selectedObject = intersects[0].object;
+    if (selectedObject === videoPlane) {
+      transformControls.attach(videoPlane); // Adjuntar TransformControls al plano
+    
+    }
+  }
+});
+
+// Iniciar o pausar la animación al presionar "Reproducir Animación"
+const toggleAnimationButton = document.getElementById("btnPlay");
+toggleAnimationButton.addEventListener("click", () => {
+  if (videoElement) {
+    if (videoElement.paused) {
+      videoElement.play();
+      
+    }
+  }
+});
+const shadowButton = document.getElementById("shadow-button");
+const shadowMenu = document.getElementById("shadow-menu");
+const shadowOptions = document.getElementById("shadow-options");
+const enableShadow = document.getElementById("enable-shadow");
+const disableShadow = document.getElementById("disable-shadow");
+const castShadow = document.getElementById("cast-shadow");
+const receiveShadow = document.getElementById("receive-shadow");
+const bothShadow = document.getElementById("both-shadow");
+
+// Mostrar/ocultar menú
+shadowButton.addEventListener("click", () => {
+  shadowMenu.style.display = shadowMenu.style.display === "block" ? "none" : "block";
+});
+
+// Habilitar sombras
+enableShadow.addEventListener("click", () => {
+  shadowOptions.style.display = "block";
+});
+
+// Deshabilitar sombras
+disableShadow.addEventListener("click", () => {
+  shadowOptions.style.display = "none";
+  if (transformControls.object) {
+    const selectedObject = transformControls.object;
+    selectedObject.castShadow = false;
+    selectedObject.receiveShadow = false;
+    alert("Sombras desactivadas para el objeto seleccionado.");
+  }
+});
+
+// Configurar sombras según opción
+castShadow.addEventListener("click", () => {
+  if (transformControls.object) {
+    const selectedObject = transformControls.object;
+    selectedObject.castShadow = true;
+    selectedObject.receiveShadow = false;
+    alert("El objeto ahora emite sombras.");
+  }
+});
+
+receiveShadow.addEventListener("click", () => {
+  if (transformControls.object) {
+    const selectedObject = transformControls.object;
+    selectedObject.castShadow = false;
+    selectedObject.receiveShadow = true;
+    alert("El objeto ahora recibe sombras.");
+  }
+});
+
+bothShadow.addEventListener("click", () => {
+  if (transformControls.object) {
+    const selectedObject = transformControls.object;
+    selectedObject.castShadow = true;
+    selectedObject.receiveShadow = true;
+    alert("El objeto ahora emite y recibe sombras.");
+  }
+});
+const shadowTypeSelect = document.getElementById("shadow-type-select");
+
+// Cambiar el tipo de sombra según la selección
+shadowTypeSelect.addEventListener("change", () => {
+  const selectedType = shadowTypeSelect.value;
+
+  // Mapear el valor seleccionado al tipo de sombra en Three.js
+  switch (selectedType) {
+    case "PCFSoftShadowMap":
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      break;
+    case "PCFShadowMap":
+      renderer.shadowMap.type = THREE.PCFShadowMap;
+      break;
+    case "VSMShadowMap":
+      renderer.shadowMap.type = THREE.VSMShadowMap;
+      break;
+    case "BasicShadowMap":
+      renderer.shadowMap.type = THREE.BasicShadowMap;
+      break;
+  }
+
+  // Volver a renderizar para aplicar el cambio
+  renderer.shadowMap.needsUpdate = true;
+  alert(`Sombra cambiada a: ${selectedType}`);
+});
+if (currentLight && currentLight.shadow) {
+  currentLight.shadow.mapSize.width = 1024; // Cambiar ancho del mapa
+  currentLight.shadow.mapSize.height = 1024; // Cambiar alto del mapa
+  currentLight.shadow.needsUpdate = true; // Actualizar mapa de sombras
+}
+if (currentLight && currentLight.shadow) {
+  currentLight.shadow.camera.near = 0.1; // Distancia mínima
+  currentLight.shadow.camera.far = 500; // Distancia máxima
+  currentLight.shadow.camera.updateProjectionMatrix(); // Actualizar cámara
+}
+
+// Obtener botones del DOM
+const ccolorButton = document.getElementById('ccolorButton');
+const okButton = document.getElementById('okButton');
+
+// Variables para el cubo de control y el objeto original
+let controlCube = null;
+let originalObject = null;
+
+// Lógica para el botón "ccolor"
+ccolorButton.addEventListener('click', () => {
+  // Verificar si hay un objeto seleccionado
+  if (!transformControls.object) {
+    alert('Por favor, selecciona un objeto primero.');
+    return;
+  }
+
+  // Guardar referencia al objeto original
+  originalObject = transformControls.object;
+
+  // Crear un cubo de aristas (color verde)
+  const geometry = new THREE.BoxGeometry(3, 3, 3);
+  const edges = new THREE.EdgesGeometry(geometry);
+  const material = new THREE.LineBasicMaterial({ color: 0x00ff00 }); // Verde
+  controlCube = new THREE.LineSegments(edges, material);
+
+  // Posicionar el cubo en el objeto seleccionado
+  controlCube.position.copy(originalObject.position);
+
+  // Añadir el cubo a la escena
+  scene.add(controlCube);
+
+  // Adjuntar TransformControls al cubo
+  transformControls.attach(controlCube);
+
+  // Mostrar el botón "OK"
+  okButton.style.display = 'block';
+});
+
+// Lógica para seleccionar el cubo de control
+renderer.domElement.addEventListener('click', (event) => {
+  const rect = renderer.domElement.getBoundingClientRect();
+  const mouse = new THREE.Vector2();
+  mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+  const raycaster = new THREE.Raycaster();
+  raycaster.setFromCamera(mouse, camera);
+
+  const intersects = raycaster.intersectObject(controlCube);
+  if (intersects.length > 0) {
+    // Adjuntar TransformControls al cubo
+    transformControls.attach(controlCube);
+  }
+});
+
+// Lógica para el botón "OK"
+okButton.addEventListener('click', () => {
+  if (!controlCube) {
+    alert('No hay un cubo de control creado.');
+    return;
+  }
+
+  // Desconectar TransformControls del cubo
+  transformControls.detach();
+
+  // Habilitar la rotación para ajustar propiedades
+  controlCube.rotation.set(0, 0, 0);
+
+  // Escuchar cambios de rotación para modificar propiedades
+  controlCube.userData.interval = setInterval(() => {
+    if (!originalObject) return;
+
+    const rotation = controlCube.rotation;
+
+    // Cambiar el color con el eje X
+    const hue = (rotation.x % (Math.PI * 2)) / (Math.PI * 2);
+    originalObject.material.color.setHSL(hue, 1, 0.5);
+
+    // Ajustar el brillo con el eje Y
+    const brightness = THREE.MathUtils.clamp(rotation.y / Math.PI, 0, 1);
+    originalObject.material.color.offsetHSL(0, 0, brightness - 0.5);
+
+    // Cambiar la emisividad con el eje Z
+    const emissiveStrength = THREE.MathUtils.clamp(rotation.z / Math.PI, 0, 1);
+    originalObject.material.emissive = new THREE.Color(originalObject.material.color);
+    originalObject.material.emissiveIntensity = emissiveStrength;
+
+    originalObject.material.needsUpdate = true;
+  }, 100);
+});
+// Obtener botones del DOM
+const ttransformButton = document.getElementById('ttransformButton');
+const okTransformButton = document.getElementById('okTransformButton');
+const centerButton = document.getElementById('centerButton');
+
+// Variables globales
+let transformCube = null;
+let savedStates = {};
+let frame;
+let isConfirmed = false; // Para saber si se ha confirmado el movimiento del cubo
+
+// Crear el marco cuadrado 2D
+function createFrame() {
+  const geometry = new THREE.PlaneGeometry(10, 10); // Marco cuadrado
+  const material = new THREE.LineBasicMaterial({ color: 0xff0000 }); // Rojo
+  frame = new THREE.LineSegments(new THREE.EdgesGeometry(geometry), material);
+  frame.position.set(0, 0, 0); // Fijar el marco en el origen de la escena
+  frame.userData.isFrame = true; // Marcarlo como marco
+  scene.add(frame);
+
+  // Adjuntar TransformControls al marco para hacerlo seleccionable
+  transformControls.attach(frame);
+}
+
+// Crear el cubo de aristas azul
+function createTransformCube() {
+  const geometry = new THREE.BoxGeometry(3, 3, 3); // Cubo 3D
+  const edges = new THREE.EdgesGeometry(geometry);
+  const material = new THREE.LineBasicMaterial({ color: 0x0000ff }); // Azul
+  const cube = new THREE.LineSegments(edges, material);
+  return cube;
+}
+
+// Botón `ttransform`: Crear el cubo de aristas y el marco
+ttransformButton.addEventListener('click', () => {
+  if (!transformControls.object) {
+    alert('Por favor, selecciona un objeto primero.');
+    return;
+  }
+
+  originalObject = transformControls.object;
+
+  // Crear el cubo de transformación
+  transformCube = createTransformCube();
+  transformCube.position.copy(originalObject.position);
+  scene.add(transformCube);
+
+  // Adjuntar TransformControls al cubo de aristas
+  transformControls.attach(transformCube);
+
+  // Crear el marco
+  createFrame();
+
+  // Mostrar el botón OK
+  okTransformButton.style.display = 'block';
+});
+
+// Botón `OK`: Confirmar la posición inicial del cubo
+okTransformButton.addEventListener('click', () => {
+  if (!transformCube) {
+    alert('No hay un cubo de transformación creado.');
+    return;
+  }
+
+  // Desconectar TransformControls del cubo
+  transformControls.detach();
+  okTransformButton.style.display = 'none';
+
+  // Limitar el movimiento del cubo dentro del marco
+  transformCube.userData.limited = true;
+
+  // Hacer el cubo más 2D (aplastado)
+  transformCube.scale.set(1, 1, 0.1); // Aplastar el cubo para hacerlo más 2D
+
+  isConfirmed = true; // Confirmar que el cubo ya ha sido fijado
+
+  alert('Cubo listo para interpolar.');
+});
+
+// Guardar la posición, rotación y escala para las esquinas del marco
+function saveState(direction) {
+  if (!originalObject) {
+    alert('No hay un objeto seleccionado.');
+    return;
+  }
+
+  const { position, rotation, scale } = originalObject;
+  savedStates[direction] = {
+    position: position.clone(),
+    rotation: rotation.clone(),
+    scale: scale.clone(),
+  };
+}
+
+// Interpolar valores entre dos estados
+function interpolateState(direction, t) {
+  if (!savedStates[direction]) return;
+
+  const { position, rotation, scale } = savedStates[direction];
+
+  // Interpolación de posición
+  originalObject.position.lerp(position, t);
+
+  // Interpolación de rotación
+  originalObject.rotation.x += (rotation.x - originalObject.rotation.x) * t;
+  originalObject.rotation.y += (rotation.y - originalObject.rotation.y) * t;
+  originalObject.rotation.z += (rotation.z - originalObject.rotation.z) * t;
+
+  // Interpolación de escala
+  originalObject.scale.lerp(scale, t);
+}
+
+// Configurar los botones para las 4 esquinas
+document.getElementById('topRightButton').addEventListener('click', () => saveState('topRight'));
+document.getElementById('topLeftButton').addEventListener('click', () => saveState('topLeft'));
+document.getElementById('bottomRightButton').addEventListener('click', () => saveState('bottomRight'));
+document.getElementById('bottomLeftButton').addEventListener('click', () => saveState('bottomLeft'));
+centerButton.addEventListener('click', () => saveState('center'));
+
+// Monitorear movimiento del cubo de transformación
+setInterval(() => {
+  if (!transformCube || !transformCube.userData.limited) return;
+
+  // Limitar la posición del cubo dentro del marco 2D
+  transformCube.position.x = THREE.MathUtils.clamp(transformCube.position.x, -5, 5);
+  transformCube.position.y = THREE.MathUtils.clamp(transformCube.position.y, -10, 10);
+
+  const t = THREE.MathUtils.clamp(transformCube.position.length() / 5, 0, 1);
+
+  // Determinar la esquina donde se encuentra el cubo y aplicar interpolación
+  if (transformCube.position.x > 0 && transformCube.position.y > 0) {
+    interpolateState('topRight', t);
+  } else if (transformCube.position.x < 0 && transformCube.position.y > 0) {
+    interpolateState('topLeft', t);
+  } else if (transformCube.position.x > 0 && transformCube.position.y < 0) {
+    interpolateState('bottomRight', t);
+  } else if (transformCube.position.x < 0 && transformCube.position.y < 0) {
+    interpolateState('bottomLeft', t);
+  } else {
+    interpolateState('center', t);
+  }
+}, 100);
+
+// Hacer que el cubo sea seleccionable para adjuntar TransformControls
+renderer.domElement.addEventListener('click', (event) => {
+  if (!isConfirmed) return; // Solo permitir seleccionar después de confirmar
+
+  const rect = renderer.domElement.getBoundingClientRect();
+  const mouse = new THREE.Vector2();
+  mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+  const raycaster = new THREE.Raycaster();
+  raycaster.setFromCamera(mouse, camera);
+
+  const intersects = raycaster.intersectObject(transformCube);
+  if (intersects.length > 0) {
+    // Adjuntar TransformControls al cubo
+    transformControls.attach(transformCube);
+  }
+});
+
+//finnn😞🤩😒🤩
+// Referencia a los elementos 
+const transparencyMenu = document.getElementById("transparencyMenu");
+
+const transparencyValue = document.getElementById("transparencyValue");
+
+// Mostrar/ocultar el menú de transparencia al presionar el botón
+transparencyButton.addEventListener("click", () => {
+  transparencyMenu.style.display = transparencyMenu.style.display === "none" ? "block" : "none";
+});
+
+// Ajustar la transparencia del objeto seleccionado
+transparencySlider.addEventListener("input", (event) => {
+  const transparency = parseFloat(event.target.value);
+  transparencyValue.textContent = transparency.toFixed(2);  // Mostrar el valor de la transparencia
+
+  // Verificar si hay un objeto seleccionado
+  if (transformControls.object) {
+    const selectedObject = transformControls.object;
+    
+    // Si el material del objeto es un material con transparencia, ajustamos el valor
+    if (selectedObject.material && selectedObject.material.transparent !== undefined) {
+      selectedObject.material.opacity = transparency;  // Ajustar la transparencia
+      selectedObject.material.needsUpdate = true;  // Actualizar el material
+    }
+  }
+});
+document.getElementById('moveFrameAndCubeButton').addEventListener('click', () => {
+  if (!frame || !transformCube) {
+    alert('Asegúrate de que el marco y el cubo estén creados.');
+    return;
+  }
+
+  // Desconectar los controles de transformación si están conectados a otro objeto
+  transformControls.detach();
+
+  // Conectar los TransformControls al marco
+  transformControls.attach(frame);  // Mover el marco, lo que moverá al cubo también, ya que el cubo es hijo del marco
+
+  // Confirmación
+  alert('Los controles de transformación están ahora aplicados al marco. El cubo se moverá con él.');
+});
+// Obtener el checkbox del DOM
+const toggleFrameCheckbox = document.getElementById('toggleFrame');
+
+// Función para mostrar/ocultar el marco y el cubo
+function toggleFrameVisibility() {
+  if (toggleFrameCheckbox.checked) {
+    // Mostrar el marco y el cubo
+    if (frame) frame.visible = true;
+    if (transformCube) transformCube.visible = true;
+  } else {
+    // Ocultar el marco y el cubo
+    if (frame) frame.visible = false;
+    if (transformCube) transformCube.visible = false;
+  }
+}
+
+// Escuchar el cambio en el checkbox
+toggleFrameCheckbox.addEventListener('change', toggleFrameVisibility);
+
+// Llamar a la función para inicializar el estado (por defecto visible)
+toggleFrameVisibility();
+// Obtener el checkbox del DOM
+const toggleControlCubeCheckbox = document.getElementById('toggleControlCube');
+
+// Función para mostrar/ocultar el cubo de control y el botón OK
+function toggleControlCubeVisibility() {
+  if (toggleControlCubeCheckbox.checked) {
+    // Mostrar el cubo de control y el botón OK
+    if (controlCube) controlCube.visible = true;
+    okButton.style.display = 'block';
+  } else {
+    // Ocultar el cubo de control y el botón OK
+    if (controlCube) controlCube.visible = false;
+    okButton.style.display = 'none';
+  }
+}
+
+// Escuchar el cambio en el checkbox
+toggleControlCubeCheckbox.addEventListener('change', toggleControlCubeVisibility);
+
+// Llamar a la función para inicializar el estado (por defecto visible)
+toggleControlCubeVisibility();
+// Asumimos que ya tienes estos objetos creados y configurados previamente
+
+// Crear un loader de objetos OBJ
+const loader = new THREE.OBJLoader();
+
+// Para guardar los objetos importados
+const importedObjects = [];
+
+// Botón de importación y lista de objetos
+const importButton = document.getElementById('import-obj-button');
+const fileInput = document.getElementById('file-input');
+const listaObjButton = document.getElementById('lista-obj-button');
+const listaObj = document.getElementById('lista-obj');
+
+// Abrir el selector de archivos
+importButton.addEventListener('click', function() {
+  fileInput.click();
+});
+
+// Cargar el modelo al seleccionar el archivo
+fileInput.addEventListener('change', function(event) {
+  const file = event.target.files[0];
+
+  if (file && file.name.endsWith('.obj')) {
+    const url = URL.createObjectURL(file);
+
+    loader.load(url, function(obj) {
+      obj.position.set(0, 0, 0); // Colocamos el objeto en el centro
+
+      // Aseguramos que todas las mallas del modelo tengan material
+      obj.traverse(function(child) {
+        if (child.isMesh) {
+          child.material = new THREE.MeshStandardMaterial({ color: 0x888888 });
+        }
+      });
+
+      // Añadir el objeto a la escena y la lista de objetos
+      scene.add(obj);
+      importedObjects.push(obj);
+
+      // Añadir el modelo a la lista de selección
+      const li = document.createElement('li');
+      li.textContent = file.name;
+      li.addEventListener('click', function() {
+        // Cuando seleccionas el nombre del objeto, adjuntamos los transformControls
+        transformControls.attach(obj);
+      });
+
+      listaObj.appendChild(li);
+    });
+  } else {
+    console.error('Por favor, selecciona un archivo .obj');
+  }
+});
+
+// Mostrar y ocultar la lista de objetos
+listaObjButton.addEventListener('click', function() {
+  listaObj.style.display = listaObj.style.display === 'none' ? 'block' : 'none';
+});
+// Referencia al botón "Obj Material" y al panel de material
+const objMaterialBtn = document.getElementById('objMaterialBtn');
+const materialPanel = document.getElementById('materialPanel');
+
+// Variables para ajustar el material
+
+let materialParams = {
+  color: 0xffffff,
+  transparency: 1.0,
+  emissive: 0x000000,
+  emissiveColor: 0xffffff,
+  shadow: true,
+};
+
+
+// Función para aplicar el material al objeto seleccionado
+function aplicarMaterial(obj) {
+  obj.traverse(function(child) {
+    if (child.isMesh) {
+      const material = new THREE.MeshStandardMaterial({
+        color: materialParams.color,
+        transparent: true,
+        opacity: materialParams.transparency,
+        emissive: materialParams.emissive,
+        emissiveColor: materialParams.emissiveColor,
+      });
+      
+      // Activar sombras si el parámetro está habilitado con calidad alta
+child.castShadow = materialParams.shadow;
+child.receiveShadow = materialParams.shadow;
+
+
+// Configurar la sombra de alta calidad (sin agregar nuevas propiedades)
+
+
+      // Asignar el material al objeto
+      child.material = material;
+    }
+  });
+}
+
+// Llamada cuando se hace clic en un objeto para seleccionar
+function seleccionarObjeto(obj) {
+  selectedObject = obj;
+  aplicarMaterial(selectedObject);
+}
+
+// Evento del botón "Obj Material" para abrir el formulario de edición
+objMaterialBtn.addEventListener('click', function() {
+  if (!selectedObject) {
+    alert('Selecciona un objeto primero.');
+    return;
+  }
+
+  // Mostrar el panel de material
+  materialPanel.style.display = 'block';
+
+  // Obtener los valores de los controles
+  const colorInput = document.getElementById('color');
+  const transparencyInput = document.getElementById('transparency');
+  const emissiveInput = document.getElementById('emissive');
+  const emissiveColorInput = document.getElementById('emissiveColor');
+  const shadowInput = document.getElementById('shadow');
+  const applyBtn = document.getElementById('applyMaterialBtn');
+  const closeBtn = document.getElementById('closePanelBtn');
+
+
+  // Actualizar los valores del panel con los parámetros actuales
+  colorInput.value = `#${materialParams.color.toString(16).padStart(6, '0')}`;
+  transparencyInput.value = materialParams.transparency;
+  emissiveInput.value = `#${materialParams.emissive.toString(16).padStart(6, '0')}`;
+  emissiveColorInput.value = `#${materialParams.emissiveColor.toString(16).padStart(6, '0')}`;
+  shadowInput.checked = materialParams.shadow;
+
+  // Actualizar los parámetros cuando cambian los controles
+  colorInput.addEventListener('input', () => {
+    materialParams.color = parseInt(colorInput.value.slice(1), 16);
+  });
+  transparencyInput.addEventListener('input', () => {
+    materialParams.transparency = transparencyInput.value;
+  });
+  emissiveInput.addEventListener('input', () => {
+    materialParams.emissive = parseInt(emissiveInput.value.slice(1), 16);
+  });
+  emissiveColorInput.addEventListener('input', () => {
+    materialParams.emissiveColor = parseInt(emissiveColorInput.value.slice(1), 16);
+  });
+  shadowInput.addEventListener('change', () => {
+    materialParams.shadow = shadowInput.checked;
+  });
+
+  // Aplicar material al objeto
+  applyBtn.addEventListener('click', function() {
+    if (selectedObject) {
+      aplicarMaterial(selectedObject);
+      alert('Material aplicado correctamente');
+    }
+  });
+
+  // Cerrar el panel
+  closeBtn.addEventListener('click', function() {
+    materialPanel.style.display = 'none';
+  });
+});
+// Luz direccional
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0); // Luz direccional
+directionalLight.position.set(10, 10, 10); // Posición de la luz
+scene.add(directionalLight);
+// Luz direccional opuesta (creada como ejemplo)
+const directionalLightOpposite = new THREE.DirectionalLight(0xffffff, 0); // Luz direccional opuesta
+directionalLightOpposite.position.set(-10, -10, -10); // Posición de la luz opuesta
+scene.add(directionalLightOpposite);
+
+
+  </script>
+</body>
+</html>

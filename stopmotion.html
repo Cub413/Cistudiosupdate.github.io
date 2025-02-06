@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stop Motion</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #d6bfa5; /* Color madera clara */
+        }
+
+        header {
+            background-color: #8b5a2b; /* Color madera oscura */
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 1.5em;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .container {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .preview {
+            width: 90%;
+            height: 200px;
+            background-color: #f4e3d7;
+            border: 2px solid #8b5a2b;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button {
+            background-color: #c19a6b; /* Color madera clara */
+            color: white;
+            border: 2px solid #8b5a2b;
+            border-radius: 5px;
+            padding: 10px 15px;
+            font-size: 1em;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            background-color: #a0754e;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        label {
+            display: inline-block;
+            background-color: #c19a6b;
+            color: white;
+            border: 2px solid #8b5a2b;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        label:hover {
+            background-color: #a0754e;
+        }
+
+        .fps-control {
+            margin-top: 10px;
+        }
+
+        .navigation {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        select {
+            padding: 10px;
+            background-color: #c19a6b;
+            color: white;
+            border: 2px solid #8b5a2b;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .camera-menu {
+            display: none;
+            flex-direction: column;
+            position: absolute;
+            background-color: #f4e3d7;
+            border: 2px solid #8b5a2b;
+            padding: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            top: 50px;
+            left: 10%;
+            z-index: 10;
+        }
+
+        .camera-menu button {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <header>Animación Stop Motion</header>
+    <div class="container">
+        <div class="preview">Previsualización</div>
+        <div class="buttons">
+            <label for="upload">Cargar Imagen</label>
+            <input type="file" id="upload" accept="image/*">
+
+          
+            <button onclick="addFrame()">Agregar Cuadro</button>
+            <button onclick="deleteFrame()">Eliminar Cuadro</button>
+            <button onclick="playAnimation()">Reproducir</button>
+        </div>
+
+        <div class="fps-control">
+            <label for="fps">FPS:</label>
+            <input type="number" id="fps" value="10" min="1" max="30">
+        </div>
+
+        <div class="navigation">
+            <button onclick="prevFrame()">Anterior</button>
+            <button onclick="nextFrame()">Siguiente</button>
+        </div>
+    </div>
+
+
+    <script>
+        // Variables principales
+        const frames = [];
+        let currentFrame = 0;
+        const preview = document.querySelector('.preview');
+        const fpsInput = document.getElementById('fps');
+        let mediaStream = null;
+        let videoElement = null;
+
+
+
+        // Función para agregar una imagen como cuadro
+        function addFrame() {
+            const input = document.getElementById('upload');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    frames.push(e.target.result);
+                    currentFrame = frames.length - 1;  // Mover al último cuadro agregado
+                    updatePreview();
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Función para eliminar el último cuadro
+        function deleteFrame() {
+            if (frames.length > 0) {
+                frames.pop();
+                currentFrame = frames.length - 1;  // Ajustamos el índice
+                updatePreview();
+            }
+        }
+
+        // Función para actualizar la previsualización
+        function updatePreview() {
+            if (frames.length > 0) {
+                preview.innerHTML = `<img src="${frames[currentFrame]}" style="max-width: 100%; max-height: 100%;">`;
+            } else {
+                preview.innerHTML = 'Previsualización';
+            }
+        }
+
+        // Función para reproducir la animación
+        function playAnimation() {
+            if (frames.length > 0) {
+                let index = 0;
+                const fps = parseInt(fpsInput.value) || 10; // FPS ajustables
+                const interval = setInterval(() => {
+                    preview.innerHTML = `<img src="${frames[index]}" style="max-width: 100%; max-height: 100%;">`;
+                    index = (index + 1) % frames.length;
+                }, 1000 / fps); // Se ajusta el tiempo según el FPS
+                setTimeout(() => clearInterval(interval), frames.length * (1000 / fps));
+            } else {
+                alert('No hay cuadros para reproducir.');
+            }
+        }
+
+        // Función para retroceder al fotograma anterior
+        function prevFrame() {
+            if (frames.length > 0 && currentFrame > 0) {
+                currentFrame--;
+                updatePreview();
+            }
+        }
+
+        // Función para avanzar al siguiente fotograma
+        function nextFrame() {
+            if (frames.length > 0 && currentFrame < frames.length - 1) {
+                currentFrame++;
+                updatePreview();
+            }
+        }
+
+   
+    </script>
+</body>
+</html>

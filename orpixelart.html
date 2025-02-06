@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Choose Orientation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #1e1e2f;
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 15px 30px;
+      font-size: 18px;
+      background-color: #444;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #555;
+    }
+    button img {
+      width: 24px;
+      height: 24px;
+    }
+    body {
+  font-family: 'Press Start 2P', cursive;
+}
+
+  </style>
+</head>
+<body>
+  
+  <div class="container">
+    <div class="title">orientaciones disponibles</div>
+    <button id="horizontal">
+      <span style="transform: rotate(90deg); display: inline-block;">📱</span>
+      Horizontal
+    </button>
+    <button id="vertical">
+      📱 Vertical
+    </button>
+  </div>
+
+  <script>
+    const checkOrientation = (expectedOrientation) => {
+      const verify = () => {
+        const isHorizontal = window.matchMedia("(orientation: landscape)").matches;
+        const isVertical = window.matchMedia("(orientation: portrait)").matches;
+
+        if (
+          (expectedOrientation === "horizontal" && !isHorizontal) ||
+          (expectedOrientation === "vertical" && !isVertical)
+        ) {
+          alert(`Gira el dispositivo en orientación ${expectedOrientation === "horizontal" ? "horizontal" : "vertical"}.`);
+          return;
+        }
+
+        // Redirigir a 3d.html si la orientación es correcta
+        window.location.href = "pixelart.html";
+      };
+
+      // Run the initial verification
+      verify();
+
+      // Add event listener to detect changes in orientation
+      window.addEventListener("orientationchange", verify);
+    };
+
+    document.getElementById("horizontal").addEventListener("click", () => {
+      checkOrientation("horizontal");
+    });
+
+    document.getElementById("vertical").addEventListener("click", () => {
+      checkOrientation("vertical");
+    });
+  </script>
+</body>
+</html>

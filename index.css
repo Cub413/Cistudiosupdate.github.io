@@ -1,0 +1,115 @@
+/* General */
+:root {
+  --background-dark: #202225;
+  --background-light: #2C2F33;
+  --accent-primary: #7289DA;
+  --accent-hover: #5B6EAE;
+  --text-light: #FFFFFF;
+  --text-muted: #B9BBBE;
+}
+
+
+/* Header */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1em 2em;
+  background-color: var(--background-light);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+header .logo h1 {
+  margin: 0;
+  font-size: 1.5em;
+  color: var(--text-light);
+}
+
+header nav .primary-button {
+  background-color: var(--accent-primary);
+  border: none;
+  color: var(--text-light);
+  padding: 0.6em 1.2em;
+  border-radius: 5px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+header nav .primary-button:hover {
+  background-color: var(--accent-hover);
+}
+
+/* Main Content */
+main {
+  flex: 1;
+  padding: 2em;
+}
+
+.gallery-header h2 {
+  margin: 0;
+  text-align: center;
+  font-size: 1.8em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--background-light);
+  padding-bottom: 0.5em;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1em;
+  margin-top: 2em;
+}
+
+/* Project Card */
+#projectList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1em;
+  margin-top: 2em;
+}
+
+.projectCard {
+  background-color: var(--background-light);
+  border-radius: 10px;
+  padding: 1em;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.3s ease;
+}
+
+.projectCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.projectCard h3 {
+  font-size: 1.2em;
+  color: var(--text-light);
+}
+
+.projectCard button {
+  margin-top: 1em;
+  background-color: var(--accent-primary);
+  color: var(--text-light);
+  border: none;
+  padding: 0.6em 1.2em;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.projectCard button:hover {
+  background-color: var(--accent-hover);
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 1em;
+  background-color: var(--background-light);
+  font-size: 0.9em;
+  color: var(--text-muted);
+  border-top: 1px solid #333;
+}
