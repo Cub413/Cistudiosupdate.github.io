@@ -851,7 +851,7 @@ function addArrow() {
 function addCamera() {
   const cameraObjLoader = new THREE.OBJLoader();
 
-  cameraObjLoader.load('assets/Models/camera.obj', function(obj) {
+  cameraObjLoader.load('assets/models/Camera.obj', function(obj) {
     let cameraLines;
 
     obj.traverse((child) => {
