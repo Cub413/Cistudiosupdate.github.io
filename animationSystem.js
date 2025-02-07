@@ -32,10 +32,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Cambiar la imagen según el estado del autoKey
   if (autoKeyActive) {
-    autoKeyButton.innerHTML = '<img src="/assets/models/keyframe1.svg" alt="Auto Keyframe On">';
+    autoKeyButton.innerHTML = '<img src="assets/models/keyframe1.svg" alt="Auto Keyframe On">';
     autoKeyButton.style.backgroundColor = 'var(--accent-secondary)';
   } else {
-    autoKeyButton.innerHTML = '<img src="/assets/models/keyframe1.svg" alt="Auto Keyframe Off">';
+    autoKeyButton.innerHTML = '<img src="assets/models/keyframe1.svg" alt="Auto Keyframe Off">';
     autoKeyButton.style.backgroundColor = ''; 
   }
 });
@@ -76,10 +76,10 @@ function updateZoom() {
         !selectedObject.scale.equals(currentKeyframe.scale);
 
       keyframeButton.innerHTML = hasChanged 
-        ? '<img src="/assets/models/keyframe1.svg" alt="Change">'
+        ? '<img src="assets/models/keyframe1.svg" alt="Change">'
         : '<img src="" alt="Add">';
     } else {
-      keyframeButton.innerHTML = '<img src="/assets/models/keyframe1.svg" alt="Add">';
+      keyframeButton.innerHTML = '<img src="assets/models/keyframe1.svg" alt="Add">';
     }
   }
 }
@@ -138,7 +138,7 @@ copyButton.addEventListener('click', () => {
 
     if (currentKeyframe) {
       copiedKeyframe = { ...currentKeyframe };
-      icon.src = '/assets/models/keyframe1.svg';
+      icon.src = 'assets/models/keyframe1.svg';
     } else {
       alert('No hay keyframe para copiar en el frame actual.');
     }
@@ -150,7 +150,7 @@ copyButton.addEventListener('click', () => {
       keyframes.sort((a, b) => a.frame - b.frame);
       keyframesByObject.set(selectedObject, keyframes);
       copiedKeyframe = null;
-      icon.src = '/assets/models/keyframe1.svg';
+      icon.src = 'assets/models/keyframe1.svg';
       renderKeyframes();
       updateKeyframeButtonText();
     }
@@ -302,10 +302,10 @@ copyButton.addEventListener('click', () => {
   
   /* Pause Button */
   const pauseButton = document.getElementById('pauseButton');
-  pauseButton.innerHTML = isPaused ? '<img src="/assets/models/keyframe1.svg" alt="Play">' : '<img src="/assets/models/keyframe1.svg" alt="Pause">';
+  pauseButton.innerHTML = isPaused ? '<img src="assets/models/keyframe1.svg" alt="Play">' : '<img src="assets/models/keyframe1.svg" alt="Pause">';
   pauseButton.addEventListener('click', () => {
   isPaused = !isPaused;
-  pauseButton.innerHTML = isPaused ? '<img src="/assets/models/keyframe1.svg" alt="Play">' : '<img src="/assets/models/keyframe1.svg" alt="Pause">';
+  pauseButton.innerHTML = isPaused ? '<img src="assets/models/keyframe1.svg" alt="Play">' : '<img src="assets/models/keyframe1.svg" alt="Pause">';
 
   if (!isPaused) {
     pauseButton.style.backgroundColor = 'var(--accent-secondary)';
