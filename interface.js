@@ -621,7 +621,7 @@ createLightTools();
 
 function addLightIcon() {
   const textureLoader = new THREE.TextureLoader();
-  textureLoader.load('/assets/textures/light.svg', function(lightIconTexture) {
+  textureLoader.load('assets/textures/light.svg', function(lightIconTexture) {
     let lightFound = false;
 
     scene.traverse((object) => {
