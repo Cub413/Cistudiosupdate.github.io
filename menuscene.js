@@ -16,19 +16,19 @@ function updateOutliner() {
     let iconUrl = '';
 
     if (object instanceof THREE.Light) {
-      iconUrl = '/assets/models/cistudios.png';
+      iconUrl = 'assets/models/cistudios.png';
     } else if (object instanceof THREE.Camera) {
-      iconUrl = '/assets/models/cistudios.png';
+      iconUrl = 'assets/models/cistudios.png';
     } else if (object instanceof THREE.Mesh) {
-      iconUrl = '/assets/models/cistudios.png';
+      iconUrl = 'assets/models/cistudios.png';
     } else if (object instanceof THREE.Group) {
-      iconUrl = '/assets/models/cistudios.png';
+      iconUrl = 'assets/models/cistudios.png';
     } else if (object instanceof THREE.Bone) {
-      iconUrl = '/assets/models/cistudios.png';
+      iconUrl = 'assets/models/cistudios.png';
     } else if (object instanceof THREE.SkinnedMesh) {
-      iconUrl = '/assets/models/cistudios.png';
+      iconUrl = 'assets/models/cistudios.png';
     } else {
-      iconUrl = '/assets/models/cistudios.png';
+      iconUrl = 'assets/models/cistudios.png';
     }
 
     let isChildrenHidden = object.userData.isChildrenHidden || false;
@@ -38,7 +38,7 @@ function updateOutliner() {
       const toggleButton = document.createElement('button');
       toggleButton.classList.add('toggle-children-btn');
       const openIcon = document.createElement('img');
-      openIcon.src = isChildrenHidden ? '/assets/models/cistudios.png' : '/assets/models/cistudios.png';
+      openIcon.src = isChildrenHidden ? 'assets/models/cistudios.png' : 'assets/models/cistudios.png';
       openIcon.classList.add('icon');
       toggleButton.appendChild(openIcon);
       itemDiv.appendChild(toggleButton);
@@ -47,7 +47,7 @@ function updateOutliner() {
         event.stopPropagation();
         isChildrenHidden = !isChildrenHidden;
         object.userData.isChildrenHidden = isChildrenHidden;
-        openIcon.src = isChildrenHidden ? '/assets/models/cistudios.png' : '/assets/models/cistudios.png';
+        openIcon.src = isChildrenHidden ? 'assets/models/cistudios.png' : 'assets/models/cistudios.png';
 
         childrenContainers.forEach(childContainer => {
           childContainer.style.display = isChildrenHidden ? 'none' : 'block';
