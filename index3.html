@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <title>ci studios</title>
+  <!-- Asegúrate de incluir el enlace a Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <!-- CSS -->
+  <link rel="icon" type="image/png" sizes="1028x1028" href="assets/icons/cloth.png">
+  
+  <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.json">
+  
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three/examples/js/controls/TransformControls.js"></script>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
+  
+  <script src="https://fastly.jsdelivr.net/npm/ccapture.js@1.1.0/build/CCapture.all.min.js"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/three@0.130.1/examples/js/loaders/RGBELoader.js"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FBXLoader.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/examples/js/loaders/STLLoader.js"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/fflate@0.6.9/umd/index.min.js"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/objects/Reflector.js"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/cannon@0.6.2/build/cannon.min.js"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/animation/CCDIKSolver.js"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/three/examples/js/postprocessing/EffectComposer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three/examples/js/postprocessing/RenderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three/examples/js/postprocessing/SSAOPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three/examples/js/postprocessing/ShaderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three/examples/js/shaders/CopyShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three/examples/js/shaders/SSAOShader.js"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js"></script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/examples/js/exporters/OBJExporter.js"></script>
+ 
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  
+</head>
+
+<body>
+  
+  <!-- Escena 3D -->
+  <div id="container"></div>
+  
+  <!-- Camera Viewport -->
+  <div id="cameraViewport">
+    <button onclick="closeViewport()" id="closeViewport">×</button>
+    <button onclick="pin()" id="pin">fijar</button>
+  </div>
+  
+<!-- Top Bar -->
+<div id="topbar">
+  
+  <button class="actionBtn" onclick="showMenu('addMenu')"><i class="fas fa-plus" id="add"></i>Add</button>
+
+  
+  <button id="renderViewButton">RenderView</button>
+<button onclick="toggleUndoRedo()">
+  <i class="fas fa-eye-slash"></i> Undo/Redo
+</button>
+
+ 
+  
+  <select id="modeDropdown" onchange="changeMode()">
+    <option selected value="objectMode">Object Mode</option>
+    <option value="animationMode">Animation Mode</option>
+
+    <option value="materialMode">Material Mode</option>
+  </select>
+  
+  <button onclick="showMenu('outliner'), updateOutliner()"><i class="fas fa-th-list"></i>scene</button>
+
+
+
+        <!-- Botón Hamburguesa -->
+<button id="menu-button" onclick="toggleSidebar()">
+  menu</span>
+  <span></span>
+  <span></span>
+</button>
+</div>
+
+<div id="notification"></div>
+
+<!-- Add Menu Principal -->
+<div id="addMenu" class="primary-menu">
+  
+<h3>Add</h3>
+
+<div class="menu-item" onclick="showMenu('meshMenu')"><i class="fas fa-cube"></i>Mesh</div>
+
+
+
+<div class="menu-item" onclick="showMenu('lightMenu')"><i class="fas fa-lightbulb"></i>Light</div>
+
+<div class="menu-item" onclick="showMenu('presetMenu')"><i class="fas fa-cogs"></i>Presets</div>
+
+<hr>
+
+
+
+<div class="menu-item" onclick="addCamera(), hide()"><i class="fas fa-camera"></i>Camera</div>
+
+<hr>
+
+<div id="importBtn" onclick="fastImport(), hide()" class="menu-item"><i class="fas fa-upload"></i>Import</div>
+
+
+
+<hr>
+
+  
+
+</div>
+
+  </div>
+  
+<!-- Menu Options -->
+<div class="primary-menu" id="optionMenu">
+  <h3>Menu</h3>
+  
+
+  
+
+
+  
+
+    </div>
+  <div id="toolsMenuContainer">
+ <div id="lightTools" class="toolMenu">
+      <h4>Name</h4>
+<!-- Object Tools -->
+
+  </div>
+
+</div>
+
+<!-- Mesh Menu -->
+<div id="meshMenu" class="menu">
+  
+  <div class="menu-item" onclick="addPlane(), hide()"><i class="fas fa-rectangle-wide"></i>Plane</div>
+  
+  <div class="menu-item" onclick="addCube(), hide()"><i class="fas fa-cube"></i>Cube</div>
+  
+
+
+  <div class="menu-item" onclick="addSphere(), hide()"><i class="fas fa-sphere"></i>Sphere</div>
+  
+  <div class="menu-item" onclick="addCylinder(), hide()"><i class="fas fa-circle-notch"></i>Cylinder</div>
+  
+  <div class="menu-item" onclick="addPyramid(), hide()"><i class="fas fa-cogs"></i>Cone</div>
+  
+  <div class="menu-item" onclick="addToroid(), hide()"><i class="fas fa-circle"></i>dona</div>
+  
+  <hr>
+  
+  <div class="menu-item" onclick="addMonkey(), hide()"><i class="fas fa-monkey"></i>Monkey</div>
+  
+
+  
+</div>
+
+<!-- Light Menu -->
+<div id="lightMenu" class="menu">
+
+  <div class="menu-item" onclick="addPointLight(), hide()"><i class="fas fa-lightbulb"></i>Point</div>
+
+  <div class="menu-item" onclick="addDirectionalLight(), hide()"><i class="fas fa-sun"></i>Directional</div>
+
+  <div class="menu-item" onclick="addSpotLight(), hide()"><i class="fas fa-highlighter"></i>Spot</div>
+
+  <hr>
+  
+  <div class="menu-item" onclick="addAmbientLight(), hide()"><i class="fas fa-moon"></i>Ambiental</div>
+  
+  <div class="menu-item" onclick="addHemisphereLight(), hide()"><i class="fas fa-sun"></i>Hemisphere</div>
+  
+  <div class="menu-item" onclick="addRectAreaLight(), hide()"><i class="fas fa-square"></i>Area</div>
+
+</div>
+
+<!-- Line Menu -->
+<div id="lineMenu" class="menu">
+
+  <h3>Line</h3>
+
+  <div class="menu-item" onclick="addLine(), hide()"><i class="fas fa-slash"></i>Line</div>
+
+  <div class="menu-item" onclick="addCurve(), hide()"><i class="fas fa-random"></i>Curve</div>
+  
+  <div class="menu-item" onclick="addDashedLine(), hide()"><i class="fas fa-minus"></i>Dashed</div>
+
+  <hr>
+
+</div>
+
+
+<!-- Presets Menu -->
+<div id="presetMenu" class="menu">
+  <button onclick="presetSel()">
+    <i class="fas fa-save"></i> Save Preset
+  </button>
+  <button class="alert" onclick="deletePresets()">
+    <i class="fas fa-trash"></i> Delete Preset
+  </button>
+  
+  <h3>Presets</h3>
+  
+  <div id="presetsContainer"></div>
+</div>
+
+<!-- Nexel Lab -->
+<div id="nexelLabMenu" class="menu">
+  <h3>Phisics</h3>
+  
+  <div class="menu-item" onclick="hide(), showMenu('rigidBodyMenu')">
+    <i class="fas fa-flask"></i> Rigid Body
+  </div>
+  
+  <div class="menu-item" onclick="hide(), showMenu('clothesMenu')">
+    <i class="fas fa-tshirt"></i> Cloth
+  </div>
+
+  <div class="menu-item" onclick="hide(), showMenu('particlesMenu')">
+    <i class="fas fa-cogs"></i> Particles
+  </div>
+  
+  <div class="menu-item" onclick="addSea(), hide()">
+    <i class="fas fa-water"></i> Plane Ocean
+  </div>
+</div>
+<div>
+            <!-- Sidebar -->
+    <div id="sidebar">
+      <div class="section">
+        <h3>sidebar</h3>
+        <a href="home.html" class="btn"> Home</a>
+        <h3>(c)control</h3>
+        <button id="selectCubeButton">Seleccionar Cubo</button>
+<button id="selectFrameButton">Seleccionar Marco</button>
+<p>add</p>
+<!-- Botón para crear el cubo de transformación -->
+<button id="ttransformButton">ttransform</button>
+
+<p>settings</p>
+<!-- Botones de dirección -->
+<div id="direction-buttons">
+
+  <!-- Botones para las esquinas -->
+  <button id="topLeftButton">Esquina Superior Izquierda</button>
+  <button id="topRightButton">Esquina Superior Derecha</button>
+  <button id="bottomLeftButton">Esquina Inferior Izquierda</button>
+  <button id="bottomRightButton">Esquina Inferior Derecha</button>
+  <!-- Botón para el centro -->
+  <button id="centerButton">Centro</button>
+  <!-- Botón para confirmar la posición inicial del cubo -->
+  <p>confirmar</p>
+<button id="okTransformButton" style="display:none;">OK</button>
+
+
+</div>
+        <h3>menu</h3>
+          <div onclick="showMenu('renderMenu'), renderImage()" class="menu-item"><i class="fas fa-image"></i>Render</div>
+  
+  <div onclick="showMenu('sceneMenu')" class="menu-item"><i class="fas fa-palette"></i>Scene</div>
+  
+  <div onclick="showMenu('importMenu')" class="menu-item"><i class="fas fa-upload"></i>Import</div>
+   <button id="loadHdriButton"><i class="fas fa-cloud-upload-alt"></i> Load 360</button>
+  <input type="file" id="loadHdri" accept=".hdr" style="display:none;" />
+  <label for="toggleHdri">360img</label>
+  <input type="checkbox" id="toggleHdri" checked />
+
+         <button onclick="showObjectTools()" id="objectTools" class="objectTools"><i class="fas fa-tools"></i>light</button>
+          <!-- Material Mode -->
+  
+      <button onclick="presetSel()"><i class="fas fa-save"></i>Save Preset</button>
+      <div onclick="addVideo(), hide()" class="menu-item"><i class="fas fa-film"></i>Import Video</div>
+    <h4>camera</h4>
+        <input onchange="changeColor()" id="backgroundColor" type="color">
+    <button onclick="setupCameraViewport(), makeViewportDraggable()"><i class="fas fa-camera"></i>Camera Viewport</button>
+    <button onclick="closeViewport()"><i class="fas fa-times"></i>Close</button>
+    <hr>
+
+           <h5>Phisics</h5>
+    <button onclick="addStaticPhysics()"><i class="fas fa-cogs"></i>pasivo</button>
+    <button onclick="addPhysics()"><i class="fas fa-cogs"></i>activo</button>
+    <button onclick="deletePhysics()"><i class="fas fa-trash"></i>ninguno</button>
+  <h4>experi</h4>
+  <div class="menu-item" onclick="hide(), showMenu('clothesMenu')">
+    <i class="fas fa-tshirt"></i> Cloth
+</div>
+    <div class="menu-item" onclick="addSea(), hide()">
+    <i class="fas fa-water"></i> Plane Ocean
+    
+    
+  </div>
+  
+      </div>
+    </div>
+<!-- Particles -->
+<div id="particlesMenu" class="menu">
+  <h3>Particle Presets</h3>
+  
+  <div class="menu-item" onclick="addFireParticles(), hide()">
+    <i class="fas fa-fire"></i> Fire Particles
+  </div>
+  
+  <div class="menu-item" onclick="addSmokeParticles(), hide()">
+    <i class="fas fa-cloud"></i> Smoke Particles
+  </div>
+  
+  <div class="menu-item" onclick="addMagicParticles(), hide()">
+    <i class="fas fa-magic"></i> Magic Particles
+  </div>
+  
+  <div class="menu-item" onclick="addRainParticles(), hide()">
+    <i class="fas fa-cloud-showers-heavy"></i> Rain Particles
+  </div>
+  
+  <div class="menu-item" onclick="addSnowParticles(), hide()">
+    <i class="fas fa-snowflake"></i> Snow Particles
+  </div>
+  
+  <div class="menu-item" onclick="addFogParticles(), hide()">
+    <i class="fas fa-smog"></i> Fog Particles
+  </div>
+  
+  <hr>
+  
+  <h3>Particle System</h3>
+  
+  <div class="menu-item">
+    <label>Particle Type:</label>
+    <label><input type="checkbox" id="particleTypeArea"> Area</label>
+    <label><input type="checkbox" id="particleTypePoint"> Point</label>
+  </div>
+  
+  <div class="menu-item">
+    <label>Quantity:</label>
+    <input type="number" id="particleQuantity" min="1" value="100">
+  </div>
+  
+  <div class="menu-item">
+    <label>Speed:</label>
+    <input type="range" id="particleSpeed" min="0.1" max="10" step="0.1" value="1.0">
+    <span id="speedValue">1.0</span>
+  </div>
+  
+  <div class="menu-item">
+    <label>Color:</label>
+    <input type="color" id="particleColor" value="#ffffff">
+  </div>
+  
+  <div class="menu-item">
+    <label>Size:</label>
+    <input type="range" id="particleSize" min="0.1" max="5" step="0.1" value="1.0">
+    <span id="sizeValue">1.0</span>
+  </div>
+  
+  <div class="menu-item">
+    <label>Life Span (s):</label>
+    <input type="range" id="particleLifespan" min="1" max="20" step="1" value="5">
+    <span id="lifespanValue">5</span>
+  </div>
+  
+  <div class="menu-item">
+    <label>Emission Range:</label>
+    <input type="range" id="particleEmissionRange" min="1" max="50" step="1" value="10">
+    <span id="emissionRangeValue">10</span>
+  </div>
+ 
+  <div class="menu-item">
+    <label>Rotation Speed:</label>
+    <input type="range" id="particleRotationSpeed" min="0" max="5" step="0.1" value="0.5">
+    <span id="rotationSpeedValue">0.5</span>
+  </div>
+  
+  <div class="menu-item">
+    <label>Initial Scale:</label>
+    <input type="range" id="particleInitialScale" min="0.1" max="5" step="0.1" value="1.0">
+    <span id="initialScaleValue">1.0</span>
+  </div>
+
+  <div class="menu-item">
+    <label>Final Scale:</label>
+    <input type="range" id="particleFinalScale" min="0.1" max="5" step="0.1" value="0.1">
+    <span id="finalScaleValue">0.1</span>
+  </div>
+  
+  <div class="menu-item">
+    <label>Gravity Effect:</label>
+    <input type="checkbox" id="particleGravity">
+  </div>
+  
+  <div class="menu-item">
+    <label>Bounce Effect:</label>
+    <input type="checkbox" id="particleBounce">
+  </div>
+  
+  <div class="menu-item" onclick="addCustomParticles()">
+    <i class="fas fa-cogs"></i> Generate Particles
+  </div>
+</div>
+
+<div id="clothesMenu" class="menu">
+  <div id="toLeft" class="menu-item" onclick="addCloth(), hide()">
+    <i class="fas fa-tshirt"></i> Generate Cloth
+  </div>
+  <div class="menu-item">
+    <label for="clothWidth">Ancho: </label>
+    <input type="number" id="clothWidth" value="10" />
+  </div>
+  <div class="menu-item">
+    <label for="clothHeight">Altura: </label>
+    <input type="number" id="clothHeight" value="10" />
+  </div>
+  <div class="menu-item">
+    <label for="segments">segmentos: </label>
+    <input type="number" id="segments" value="12" />
+  </div>
+  <div class="menu-item">
+    <label for="clothMass">Masa: </label>
+    <input type="number" id="clothMass" value="0.1" />
+  </div>
+  <div class="menu-item">
+    <label for="clothElasticity">Elasticidad: </label>
+    <input type="number" id="clothElasticity" value="0.8" step="0.1" />
+  </div>
+  <div class="menu-item">
+    <label for="clothFriction">Friccion: </label>
+    <input type="number" id="clothFriction" value="0.2" step="0.1" />
+  </div>
+  <div class="menu-item">
+    <label for="clothDamping">amortiguacion: </label>
+    <input type="number" id="clothDamping" value="0.1" step="0.01" />
+  </div>
+</div>
+
+<div id="rigidBodyMenu" class="menu">
+  <div id="toLeft" class="menu-item" onclick="addPhysics(), hide()">
+    <i class="fas fa-cogs"></i> Apply Rigid Body
+  </div>
+
+  <div class="menu-item">
+    Mass:
+    <input id="rigidMass" type="number" value="1" step="0.1" min="0" />
+  </div>
+
+  <div class="menu-item">
+    Shape:
+    <button id="rigidShapeBtn" onclick="toggleShape()">Box</button>
+  </div>
+
+  <div class="menu-item">
+    Friction:
+    <input id="rigidFriction" type="number" value="0.3" step="0.1" min="0" />
+  </div>
+
+  <div class="menu-item">
+    Elasticity:
+    <input id="rigidRestitution" type="number" value="0.3" step="0.1" min="0" />
+  </div>
+
+  <div class="menu-item">
+    Type:
+    <button id="rigidTypeBtn" onclick="toggleRigidBodyType()">Dynamic</button>
+  </div>
+</div>
+
+<!-- Example with Font Awesome Icons -->
+<!-- Scene Menu -->
+<div id="sceneMenu" class="menu">
+  
+  <h4>Graphics</h4>
+  
+  <label><input type="checkbox" id="shadowToggle"> <i class="fas fa-sun"></i> Sombras</label>
+  
+  <label><input checked type="checkbox" id="lightingToggle"> <i class="fas fa-lightbulb"></i> Iluminación</label>
+  
+  <label><input checked type="checkbox" id="texturesToggle"> <i class="fas fa-paint-brush"></i> Texturas</label>
+  
+  <label><input type="checkbox" id="reflectionsToggle"> <i class="fas fa-mirror"></i> Reflejos</label>
+  
+  <label><input type="checkbox" id="aOToggle"> <i class="fas fa-cogs"></i> Oclusión ambiental</label>
+
+  <label><input checked type="checkbox" id="gridToggle"> <i class="fas fa-th"></i> Grid</label>
+  
+  <label><input type="checkbox" id="axesToggle"> <i class="fas fa-compass"></i> Ejes</label>
+
+
+  <label><input checked type="checkbox" id="fullHdToggle"> <i class="fas fa-tv"></i> Full HD</label>
+</div>
+
+<!-- Render Menu -->
+<div id="renderMenu" class="menu">
+  <h3>Render</h3>
+
+  <div id="renderedImage"></div>
+  <button onclick="renderImage()">Render Image</button>
+  <button id="saveRender"><i class="fas fa-save"></i> Save Render</button>
+  <div>
+
+  </div>
+</div>
+
+<!-- Import Menu -->
+<div id="importMenu" class="menu">
+  <h3>Import Models</h3>
+  <button onclick="fastImport()"><i class="fas fa-download"></i>  Import all</button>
+  <br><hr><br>
+  <button onclick="importOBJ()"><i class="fas fa-file-import"></i> .OBJ</button>
+  <button onclick="importFBX()"><i class="fas fa-file-import"></i> .FBX</button>
+  <button onclick="importGLTF()"><i class="fas fa-file-import"></i> .GLTF</button>
+  <button><i class="fas fa-file-import"></i> .STL</button>
+  <button onclick="importZIP()"><i class="fas fa-folder-open"></i> .ZIP</button>
+  <br>
+  <hr>
+
+  <button onclick="addToScene()">Add to scene</button><br>
+</div>
+
+<!-- Export Menu -->
+<div id="exportMenu" class="menu">
+  <h3>Export Scene</h3>
+  <button onclick="exportOBJ()"><i class="fas fa-file-export"></i> .OBJ</button>
+  <button onclick="exportFBX()"><i class="fas fa-file-export"></i> .FBX</button>
+  <button onclick="exportGLTF()"><i class="fas fa-file-export"></i> .GLTF</button>
+</div>
+
+<!-- Transform Controls -->
+<div class="transformControls">
+  <button onclick="toggleTransformControls()" id="transformButtons"><i class="fas fa-cogs">tc</i></button>
+  <button id="selectArea"><i class="fas fa-select"></i> Area</button>
+  
+  <button id="pos"><i class="fas fa-arrows-alt"></i> </button>
+  <button id="rot"><i class="fas fa-sync-alt"></i> </button>
+  <button id="scl"><i class="fas fa-expand"></i> </button>
+  
+
+</div>
+
+
+<!-- Action bar -->
+<div class="actionBar">
+  <button onclick="toggleActionButtons()" id="actionButtons"><i class="fa-solid fa-ellipsis"></i></button>
+  <button onclick="deleteSel()"><i class="fa-solid fa-trash"></i> Delete</button>
+  <button onclick="duplicateSel()"><i class="fa-solid fa-clone"></i> Copy</button>
+  <button onclick="groupSel()"><i class="fa-solid fa-object-group"></i> Group</button>
+  <button onclick="hideSel()"><i class="fa-solid fa-eye-slash"></i> Hide</button>
+  <button id="snap-toggle"><i class="fas fa-menu-alt"></i> Scl</button>
+  
+
+  <button onclick="fixSel()"><i class="fa-solid fa-wrench"></i> </button>
+</div>
+
+<!-- Shading Modes -->
+<div id="viewModePanel">
+  <button onclick="changeCamera()"><i class="fa-solid fa-camera"></i></button>
+
+  <sep></sep>
+
+  <button id="wireframeShading"><i class="fa-solid fa-border-all"></i></button>
+  <button id="solidShading"><i class="fa-solid fa-cube"></i></button>
+  <button id="textureShading"><i class="fa-solid fa-image"></i></button>
+  <button id="renderedShading"><i class="fa-solid fa-lightbulb"></i></button>
+</div>
+<!-- Animation Mode -->
+<button id="animationModeBtn" onclick="showTimeline()">
+  <i class="fas fa-chevron-up"></i>
+</button>
+
+<div id="animationMode" style="display: none">
+
+<div id="keyframeExtraButtons">
+  <i class="fas fa-play"></i>
+
+
+
+    <button id="copyButton">
+      <i class="fas fa-copy" aria-label="Copy"></i>
+    </button>
+
+    <button id="clearAnimation">
+      <i class="fas fa-trash-alt"></i>
+    </button>
+
+
+
+    <button id="zoomOut">
+      <i class="fas fa-search-minus"></i>
+    </button>
+
+    <button id="zoomIn">
+      <i class="fas fa-search-plus"></i>
+    </button>
+
+  </div>
+
+
+
+
+<div id="keyframeButtons">
+    <button id="autoKey" class="autoKey"><i class="fas fa-key"></i></button>
+    <hr>
+  <input type="number" class="frames" id="frameNumber" value="0"/>
+<hr>
+  <button id="prevButton"><i class="fas fa-step-backward"></i></button>
+    <button id="pauseButton"><i class="fas fa-pause"></i></button>
+  <button id="nextButton"><i class="fas fa-step-forward"></i></button>
+
+  <hr>
+  <div id="transitionSelector">
+    <select id="transitions">
+      <option value="linear">interpolacion</option>
+
+      <option value="constant">espontaneo</option>
+
+    </select>
+  </div>
+  <hr>
+
+  <button id="keyframeButton">add<i class="fas fa-keyframe"></i></button>
+</div>
+
+  
+  <div id="timelineContainer">
+    <div id="timeline"></div>
+  </div>
+  
+  </div>
+  <!-- Undo y Redo -->
+<div id="undoRedo">
+  <button id="undo" onclick="undoRedoManager.undo()">
+    <i class="fas fa-undo"></i>
+  </button>
+  <button id="redo" onclick="undoRedoManager.redo()">
+    <i class="fas fa-redo"></i>
+  </button>
+</div>
+  
+  <!-- Counters -->
+  <div id="counterContainer"></div>
+
+  <!-- Outliner -->
+  <div id="outliner">
+    <div id="outlinerDiv">
+      <div id="outlinerContainer"></div>
+    </div>
+    <div id="outlinerActions">
+  <button onclick="deleteSel()"><i class="fa-solid fa-trash"></i></button>
+  <button onclick="duplicateSel()"><i class="fa-solid fa-clone"></i></button>
+  <button onclick="groupSel()"><i class="fa-solid fa-object-group"></i></button>
+  <button onclick="centerSel()"><i class="fa-solid fa-crosshairs"></i></button>
+  <button onclick="hideSel()"><i class="fa-solid fa-eye-slash"></i></button>
+  <button onclick="renameSel()"><i class="fa-solid fa-i-cursor"></i></button>
+  <button onclick="presetSel()"><i class="fa-solid fa-star"></i></button>
+  <button onclick="parentSel()"><i class="fa-solid fa-link"></i></button>
+</div>
+  </div>
+
+  <!-- Object Properties -->
+  <div id="object-properties">
+  <h3>Properties:</h3>
+  <div class="property">
+    <strong>Name:</strong> <input type="text" id="object-name" /><button class="actionBtn" onclick="putName()">Rename</button>
+  </div>
+  <div class="property">
+    <strong>Position:</strong>
+    X: <input type="number" id="object-position-x" step="0.1" />
+    Y: <input type="number" id="object-position-y" step="0.1" />
+    Z: <input type="number" id="object-position-z" step="0.1" />
+  </div>
+  <div class="property">
+    <strong>Rotation:</strong>
+    X: <input type="number" id="object-rotation-x" step="0.1" />
+    Y: <input type="number" id="object-rotation-y" step="0.1" />
+    Z: <input type="number" id="object-rotation-z" step="0.1" />
+  </div>
+  <div class="property">
+    <strong>Scale:</strong>
+    X: <input type="number" id="object-scale-x" step="0.1" />
+    Y: <input type="number" id="object-scale-y" step="0.1" />
+    Z: <input type="number" id="object-scale-z" step="0.1" />
+  </div>
+</div>
+
+  <!-- Pestaña flotante -->
+  <div id="floatingTab" style="display: none; position: absolute; z-index: 1000;">
+  <div id="floatingButtons">
+    <button data-target="content1">Opt 1</button>
+    <button data-target="content2">Opt 2</button>
+    <button data-target="content3">Opt 3</button>
+  </div>
+  <div id="floatingContent">
+    <div id="content1">Opt 1 Content</div>
+    <div id="content2" style="display: none;">Opt 2 Content</div>
+    <div id="content3" style="display: none;">Opt 3 Content</div>
+  </div>
+</div>
+
+  <!-- Material Mode -->
+  <div id="materialMode" style="display: none">
+    <div id="materialsDiv"></div>
+    <div id="materialPropertiesDiv">
+      
+    </div>
+  </div>
+
+
+
+
+  
+<!-- Rigging Mode -->
+<div id="riggingMode" style="display: none">
+  <div id="riggingButtons">
+    <button class="actionBtn" onclick="addBone()"><i class="fa-solid fa-bone"></i> Add Bone</button>
+    <button onclick="attachSkeleton()"><i class="fa-solid fa-link"></i> Attach</button>
+    <button onclick="detachSkeleton()"><i class="fa-solid fa-unlink"></i> Detach</button>
+    <button onclick="mirrorMode()"><i class="fa-solid fa-arrows-left-right"></i> Mirror</button>
+    <button onclick="showMenu('poseEditMenu')"><i class="fa-solid fa-person-walking"></i> Pose</button>
+    <button onclick="showMenu('controllerEditMenu')"><i class="fa-solid fa-gamepad"></i> Control</button>
+    <button onclick="showMenu('dynamicsEditMenu')"><i class="fa-solid fa-wave-square"></i> Dynamics</button>
+    <button onclick="showMenu('ikEditMenu')"><i class="fa-solid fa-shoe-prints"></i> Kinematic</button>
+    <button onclick="showMenu('weightEditMenu')"><i class="fa-solid fa-weight-hanging"></i> Weight</button>
+
+    <div id="poseEditMenu" class="editMenu">
+      <h3>Poses</h3>
+      <button onclick="savePose()">Save Pose</button>
+      <button onclick="fixBoneChain()">Rename Chain</button>
+      <button class="alert" onclick="deleteSavedPoses()">Delete poses</button>
+      <hr>
+      <div id="savedPoses"></div>
+      <div id="savedKeyframes"></div>
+    </div>
+
+    <div id="controllerEditMenu" class="editMenu">
+      <h3>Controllers</h3>
+      <button onclick="addController()">Add Controller</button>
+    </div>
+
+    <div id="dynamicsEditMenu" class="editMenu">
+      <h3>Dynamics</h3>
+      <button onclick="addDynamics()">Add Dynamics</button>
+      <button onclick="addRecoil()">Add Damping</button>
+    </div>
+
+    <div id="ikEditMenu" class="editMenu">
+      <h3>Inverse Kinematics</h3>
+      <button onclick="createChain()">Setup IK Chain</button>
+      <hr>
+      <h3>Chain Configs</h3>
+      <label>Lock Controller <input type="checkbox" name="lockControllerBone" id="lockControllerBone"></label>
+      <br>
+      <label>Bone Elasticity <input type="checkbox" name="boneElasticity" id="boneElasticity"></label>
+    </div>
+
+    <div id="weightEditMenu" class="editMenu">
+      <h3>Weights</h3>
+      <select id="weightTypeSelect">
+        <option value="linear">Lineal</option>
+        <option value="smooth">Suave</option>
+        <option value="constant">Constante</option>
+        <option value="exponential">Exponencial</option>
+      </select>
+      <button onclick="verifyWeight()">Verify Weights</button>
+    </div>
+  
+<div id="hiddenPanel"></div>
+
+  <div class="menu-item" onclick="addEmpty(), hide()"><i class="fas fa-circle-notch"></i>Empty</div>
+  <div class="menu-item" onclick="addCircle(), hide()"><i class="fas fa-circle"></i>Circle</div>
+
+
+<div id="toolsMenuContainer">
+  
+  <div id="meshTools" class="toolMenu">
+    <h4>Name</h4>
+    <button onclick="showMenu('materialMode')"><i class="fas fa-paint-brush"></i>Material</button>
+    <button onclick="quickTexture()"><i class="fas fa-texture"></i>Textura Rápida</button>
+    
+    <hr>
+  
+    <hr>
+    <h5>Phisics</h5>
+    <button onclick="addStaticPhysics()"><i class="fas fa-cogs"></i>Static</button>
+    <button onclick="addPhysics()"><i class="fas fa-cogs"></i>Rigid</button>
+    <button onclick="deletePhysics()"><i class="fas fa-trash"></i>Reset</button>
+  </div>
+  
+  
+    <h4>Name</h4>
+  </div>
+  
+  <div id="boneTools" class="toolMenu">
+    <h4>Name</h4>
+    <button onclick="showMenu('constraintsEdit')"><i class="fas fa-link"></i>Constraints</button>
+    <div id="constraintsEdit" class="menu">
+      Constraints
+      <div>x</div>
+      <div>y</div>
+      <div>z</div>
+    </div>
+  </div>
+      <button onclick="lookOnObject()"><i class="fas fa-eye"></i>Look at Target</button>
+    <button onclick="addTarget()"><i class="fas fa-plus"></i>Add Target</button>
+    <hr>
+    
+    <button onclick="orthographicProjection()"><i class="fas fa-project-diagram"></i>Ortographic 2D</button>
+    <button onclick="perspectiveProjection()"><i class="fas fa-cogs"></i>Perspective 3D</button>
+  <div id="cameraTools" class="toolMenu">
+    <h4>Name</h4>
+    <input onchange="changeColor()" id="backgroundColor" type="color">
+    <button onclick="setupCameraViewport(), makeViewportDraggable()"><i class="fas fa-camera"></i>Camera Viewport</button>
+    <button onclick="closeViewport()"><i class="fas fa-times"></i>Close</button>
+    <hr>
+        <button onclick="lookOnObject()"><i class="fas fa-eye"></i>Look at Target</button>
+    <button onclick="addTarget()"><i class="fas fa-plus"></i>Add Target</button>
+    <hr>
+    
+    <button onclick="orthographicProjection()"><i class="fas fa-project-diagram"></i>Ortographic 2D</button>
+    <button onclick="perspectiveProjection()"><i class="fas fa-cogs"></i>Perspective 3D</button>
+      <button id="options" onclick="showMenu('optionMenu')"><i class="fas fa-cogs"></i>settings</button>
+
+    <option value="riggingMode">Rigging Mode</option>
+    
+  <div onclick="showMenu('exportMenu')" class="menu-item"><i class="fas fa-download"></i>Export</div>
+  <div class="menu-item" onclick="addBone(), hide()"><i class="fas fa-bone"></i>Bone</div>
+  <div class="menu-item" onclick="showMenu('lineMenu')"><i class="fas fa-random"></i>Curve</div>
+  <div onclick="showMenu('configsMenu')" class="menu-item"><i class="fas fa-cogs"></i>Configs</div>
+    <div onclick="saveProject()" id="saveProject" class="menu-item"><i class="fas fa-save"></i>Save</div>
+      <label for="togglePreview">Model Preview</label><input id="togglePreview" type="checkbox">
+  <div id="modelPreview"></div>
+      <hr>
+  <label><input type="checkbox" id="countersToggle"> <i class="fas fa-tachometer-alt"></i> Counters</label>
+      <br>
+  <label><input type="checkbox" id="wireframeToggle"> <i class="fas fa-code"></i> Wireframe</label>
+  <br>
+  <label><input type="checkbox" id="skeletonToggle"> <i class="fas fa-bone"></i> Esqueleto</label>
+          <option value="easeIn">Ease In</option>
+      <option value="easeOut">Ease Out</option>
+      <option value="easeInOut">Ease In Out</option>
+            <option value="smooth">Smooth</option>
+    <div onclick="window.location.href='index.html'" class="menu-item"><i class="fas fa-home"></i>Home<
+  <!-- Scripts -->
+  <script src="scene.js"></script>
+  <script src="themes.js"></script>
+  <script src="selectionSystem.js"></script>
+  <script src="material.js"></script>
+  <script src="animate.js"></script>
+  <script src="transform.js"></script>
+  <script src="test.js"></script>
+  <script src="actions.js"></script>
+  <script src="import.js"></script>
+  <script src="transformControls.js"></script>
+  <script src="interface.js"></script>
+  <script src="menuscene.js"></script>
+  <script src="rigging.js"></script>
+  <script src="addons.js"></script>
+  <script src="sceneView.js"></script>
+  <script src="renderEngine.js"></script>
+  <script src="animationSystem.js"></script>
+    <script src="control.js"></script>
+  <script src="editMode.js"></script>
+  <script src="undoRedoManager.js"></script>
+</html>

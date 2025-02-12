@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en" mode="ios">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inicio</title>
+
+  <!-- Ionic Core -->
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+  <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+
+
+
+  <!-- Ionic Styles -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css" />
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<<style>
+/* Dark Colors */
+
+body.dark {
+  --ion-color-primary: #007aff;
+  --ion-color-primary-rgb: 66, 140, 255;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #3a7be0;
+  --ion-color-primary-tint: #5598ff;
+  --ion-color-secondary: #50c8ff;
+  --ion-color-secondary-rgb: 80, 200, 255;
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: #46b0e0;
+  --ion-color-secondary-tint: #62ceff;
+  --ion-color-tertiary: #6a64ff;
+  --ion-color-tertiary-rgb: 106, 100, 255;
+  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-shade: #5d58e0;
+  --ion-color-tertiary-tint: #7974ff;
+  --ion-color-success: #2fdf75;
+  --ion-color-success-rgb: 47, 223, 117;
+  --ion-color-success-contrast: #000000;
+  --ion-color-success-contrast-rgb: 0, 0, 0;
+  --ion-color-success-shade: #29c467;
+  --ion-color-success-tint: #44e283;
+  --ion-color-warning: #ffd534;
+  --ion-color-warning-rgb: 255, 213, 52;
+  --ion-color-warning-contrast: #000000;
+  --ion-color-warning-contrast-rgb: 0, 0, 0;
+  --ion-color-warning-shade: #e0bb2e;
+  --ion-color-warning-tint: #ffd948;
+  --ion-color-danger: #ff4961;
+  --ion-color-danger-rgb: 255, 73, 97;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #e04055;
+  --ion-color-danger-tint: #ff5b71;
+  --ion-color-dark: #f4f5f8;
+  --ion-color-dark-rgb: 244, 245, 248;
+  --ion-color-dark-contrast: #000000;
+  --ion-color-dark-contrast-rgb: 0, 0, 0;
+  --ion-color-dark-shade: #d7d8da;
+  --ion-color-dark-tint: #f5f6f9;
+  --ion-color-medium: #989aa2;
+  --ion-color-medium-rgb: 152, 154, 162;
+  --ion-color-medium-contrast: #000000;
+  --ion-color-medium-contrast-rgb: 0, 0, 0;
+  --ion-color-medium-shade: #86888f;
+  --ion-color-medium-tint: #a2a4ab;
+  --ion-color-light: #222428;
+  --ion-color-light-rgb: 34, 36, 40;
+  --ion-color-light-contrast: #ffffff;
+  --ion-color-light-contrast-rgb: 255, 255, 255;
+  --ion-color-light-shade: #1e2023;
+  --ion-color-light-tint: #383a3e;
+}
+
+/* iOS Dark Theme */
+
+.ios body.dark {
+  --ion-background-color: #000000;
+  --ion-background-color-rgb: 0, 0, 0;
+  --ion-text-color: #ffffff;
+  --ion-text-color-rgb: 255, 255, 255;
+  --ion-color-step-50: #0d0d0d;
+  --ion-color-step-100: #1a1a1a;
+  --ion-color-step-150: #262626;
+  --ion-color-step-200: #333333;
+  --ion-color-step-250: #404040;
+  --ion-color-step-300: #4d4d4d;
+  --ion-color-step-350: #595959;
+  --ion-color-step-400: #666666;
+  --ion-color-step-450: #737373;
+  --ion-color-step-500: #808080;
+  --ion-color-step-550: #8c8c8c;
+  --ion-color-step-600: #999999;
+  --ion-color-step-650: #a6a6a6;
+  --ion-color-step-700: #b3b3b3;
+  --ion-color-step-750: #bfbfbf;
+  --ion-color-step-800: #cccccc;
+  --ion-color-step-850: #d9d9d9;
+  --ion-color-step-900: #e6e6e6;
+  --ion-color-step-950: #f2f2f2;
+  --ion-color-dark: #000000;
+  --ion-toolbar-background: #0d0d0d;
+  --ion-item-background: #1c1c1c;
+  --ion-item-background-activated: #313131;
+}
+
+/* Material Theme */
+
+.md body.dark {
+  --ion-background-color: #121212;
+  --ion-background-color-rgb: 18, 18, 18;
+  --ion-text-color: #ffffff;
+  --ion-text-color-rgb: 255, 255, 255;
+  --ion-border-color: #222222;
+  --ion-color-step-50: #1e1e1e;
+  --ion-color-step-100: #2a2a2a;
+  --ion-color-step-150: #363636;
+  --ion-color-step-200: #414141;
+  --ion-color-step-250: #4d4d4d;
+  --ion-color-step-300: #595959;
+  --ion-color-step-350: #656565;
+  --ion-color-step-400: #717171;
+  --ion-color-step-450: #7d7d7d;
+  --ion-color-step-500: #898989;
+  --ion-color-step-550: #949494;
+  --ion-color-step-600: #a0a0a0;
+  --ion-color-step-650: #acacac;
+  --ion-color-step-700: #b8b8b8;
+  --ion-color-step-750: #c4c4c4;
+  --ion-color-step-800: #d0d0d0;
+  --ion-color-step-850: #dbdbdb;
+  --ion-color-step-900: #e7e7e7;
+  --ion-color-step-950: #f3f3f3;
+  --ion-item-background: #1a1b1e;
+}
+
+ion-toolbar {
+  --background: transparent;
+  backdrop-filter: blur(50px);
+}  
+</style>
+<body>
+  <ion-app>
+    <ion-tabs>
+      <!-- Define the tab bar with buttons -->
+      <ion-tab-bar slot="bottom">
+        <ion-tab-button tab="tab1">
+          <ion-icon name="home"></ion-icon>
+          <ion-label>Home</ion-label>
+        </ion-tab-button>
+        <ion-tab-button tab="tab2">
+          <ion-icon name="information-circle"></ion-icon>
+          <ion-label>Info</ion-label>
+        </ion-tab-button>
+        <ion-tab-button tab="tab3">
+          <ion-icon name="settings"></ion-icon>
+          <ion-label>Settings</ion-label>
+        </ion-tab-button>
+      </ion-tab-bar>
+
+      <!-- Define the tab content -->
+      <ion-tab tab="tab1">
+        <ion-header>
+          <ion-toolbar>
+            <ion-title>Home</ion-title>
+          </ion-toolbar>
+        </ion-header>
+        <ion-content class="ion-padding">
+
+          
+                    <ion-button id="btnYoutube">YouTube</ion-button>
+              
+                   <ion-button id="2d">2d animation</ion-button>
+                                      <ion-button id="3d">3d animation</ion-button>
+                                                                            <ion-button id="PIXELART">Pixel art</ion-button>
+                                                                                                                  <ion-button id="stopmotion">stopmotion</ion-button>
+          </ion-action-sheet>
+        </ion-content>
+      </ion-tab>
+
+      <ion-tab tab="tab2">
+        <ion-header>
+          <ion-toolbar>
+            <ion-title>Information</ion-title>
+          </ion-toolbar>
+        </ion-header>
+        <ion-content class="ion-padding">
+          <h1 class="text-center text-2xl font-bold mb-2">Information ci studios</h1>
+          <p>bienvenido/a a ci studios la nueva app/apk de animación tanto 3d como 2d no olvides Suscribirte a ci studios en youtube como c.i studios y instagram como c.i_studios gracias♡.</p>
+                    <h1 class="text-center text-2xl font-bold mb-2">actualizaciones🤩</h1>
+          
+<p>#nuevo estilo de animacion:</p>
+<p>stopmotion y pixel art</p>
+<p>#mejoras en 3d</p>
+<p>#nuevos sistemas en 2d</p>
+<p>COMPRUEVALO TU MISMO</p>
+        </ion-content>
+      </ion-tab>
+
+      <ion-tab tab="tab3">
+        <ion-header>
+          <ion-toolbar>
+            <ion-title>settings</ion-title>
+          </ion-toolbar>
+        </ion-header>
+        <ion-content>
+          <ion-list inset="true">
+            <ion-item>
+              <ion-input label="First Name"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-input label="Last Name"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-toggle class="themeToggle">
+                <ion-label>dark/light</ion-label>
+                <ion-note color="medium">tema</ion-note>
+              </ion-toggle>
+            </ion-item>
+          </ion-list>
+
+          <ion-list inset="true">
+            <ion-item>
+              <ion-textarea label="Comments" label-placement="floating" rows="5"></ion-textarea>
+            </ion-item>
+          </ion-list>
+
+          <ion-note color="medium" class="ion-margin-horizontal block">
+          deja tus opiniones para la próximas actualizaciones 
+          </ion-note>
+        </ion-content>
+      </ion-tab>
+    </ion-tabs>
+  </ion-app>
+
+  <!-- Custom JavaScript -->
+  <script src="/js/main.js"></script>
+  
+  <<script>
+     document.addEventListener('DOMContentLoaded', () => {
+   const toggles = document.querySelectorAll('.themeToggle');
+   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+   // Function to get the ion-content of tab3
+   function getTab3Content() {
+     const tab3 = document.querySelector('ion-tab[tab="tab3"]');
+     return tab3 ? tab3.querySelector('ion-content') : null;
+   }
+
+   // Apply the stored theme on page load
+   function loadApp() {
+     const savedTheme = localStorage.getItem('theme');
+     const isDark = savedTheme === 'dark' || (!savedTheme && prefersDark.matches);
+     updateTheme(isDark);
+   }
+
+   // Update theme in local storage and ion-content color attribute
+   function updateTheme(isDark) {
+     document.body.classList.toggle('dark', isDark);
+
+     // Change the color attribute of ion-content in tab3 based on the theme
+     const content = getTab3Content();
+     if (content) {
+       content.setAttribute('color', isDark ? 'dark' : 'light');
+     }
+
+     localStorage.setItem('theme', isDark ? 'dark' : 'light');
+     toggles.forEach(toggle => toggle.checked = isDark); // Synchronize all toggles
+   }
+
+   // Set event listeners for toggles
+   toggles.forEach(toggle => {
+     toggle.addEventListener('ionChange', (ev) => {
+       const isDark = ev.detail.checked;
+       updateTheme(isDark);
+     });
+   });
+
+   // Update theme on system preference change
+   prefersDark.addEventListener('change', (e) => {
+     updateTheme(e.matches);
+   });
+
+   loadApp();
+
+   // Configure action sheet (ensure there's only one instance or handle accordingly)
+   const actionSheet = document.querySelector('ion-action-sheet');
+   if (actionSheet) {
+     actionSheet.buttons = [
+       {
+         text: 'Delete',
+         role: 'destructive',
+         data: { action: 'delete' },
+      },
+       {
+         text: 'Share',
+         data: { action: 'share' },
+      },
+       {
+         text: 'Cancel',
+         role: 'cancel',
+         data: { action: 'cancel' },
+      },
+    ];
+   }
+ });
+ 
+  
+    document.getElementById('btnYoutube').addEventListener('click', function () {
+      window.location.href = 'https://youtube.com/@cubito...?si=RTwC_lMm169tk3X_'; // Redirige a YouTube
+    });
+      document.addEventListener('DOMContentLoaded', () => {
+    const openButton = document.getElementById('2d');
+    
+    openButton.addEventListener('click', () => {
+      window.location.href = 'or2d.html'; // Redirige a edit.html
+    });
+  });
+        document.addEventListener('DOMContentLoaded', () => {
+    const openButton = document.getElementById('3d');
+    
+    openButton.addEventListener('click', () => {
+      window.location.href = 'or3d.html'; // Redirige a edit.html
+    });
+  });
+    document.addEventListener('DOMContentLoaded', () => {
+    const openButton = document.getElementById('PIXELART');
+    
+    openButton.addEventListener('click', () => {
+      window.location.href = 'orpixelart.html'; // Redirige a edit.html
+    });
+  });
+  document.addEventListener('DOMContentLoaded', () => {
+    const openButton = document.getElementById('stopmotion');
+    
+    openButton.addEventListener('click', () => {
+      window.location.href = 'orstopmotion.html'; // Redirige a edit.html
+    });
+  });
+
+  </script>
+</body>
+
+</html>
